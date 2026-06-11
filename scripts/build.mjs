@@ -1,7 +1,7 @@
-import * as fs from 'node:fs/promises';
+import { cp, mkdir, rm, readFile, writeFile } from 'node:fs/promises';
 import App from '../src/App.js';
 
-const template = await fs.readFile('index.html', 'utf8');
+const template = await readFile('index.html', 'utf8');
 const appMarkup = App();
 const hydrationScript = String.raw`<script>
   document.documentElement.classList.add('motion-ready');
@@ -48,9 +48,16 @@ const prerenderedHtml = template
   .replace('<!--HYDRATION_SCRIPT-->', hydrationScript);
 
 for (const outputDir of ['dist', 'public']) {
-  await fs.rm(outputDir, { recursive: true, force: true });
-  await fs.mkdir(`${outputDir}/src`, { recursive: true });
-  await fs.writeFile(`${outputDir}/index.html`, prerenderedHtml);
-  await fs.cp('src', `${outputDir}/src`, { recursive: true });
+  await rm(outputDir, { recursive: true, force: true });
+  await mkdir(`${outputDir}/src`, { recursive: true });
+  await writeFile(`${outputDir}/index.html`, prerenderedHtml);
+  await cp('src', `${outputDir}/src`, { recursive: true });
 }
 console.log('Built prerendered static DFB Solutions site into dist/ and public/');
+import { cp, mkdir, rm } from 'node:fs/promises';
+
+await rm('dist', { recursive: true, force: true });
+await mkdir('dist/src', { recursive: true });
+await cp('index.html', 'dist/index.html');
+await cp('src', 'dist/src', { recursive: true });
+console.log('Built static DFB Solutions site into dist/');
