@@ -1,0 +1,8 @@
+import SectionHeader from './SectionHeader.jsx';
+import { html } from './utils.js';
+
+const dspButtons = ['Spotify', 'Apple Music', 'YouTube Music', 'Tidal', 'Audiomack', 'SoundCloud'];
+
+export default function SoundSection() {
+  return html`<section id="sound" class="section" aria-labelledby="sound-heading"><div class="container">${SectionHeader({ eyebrow: 'Sound', title: 'The Sound Behind The Vision.', subtitle: 'Before the builds, brands, apps, and systems, there was the voice. DFB carries real life, storytelling, pain, purpose, ambition, and culture into everything created under the brand.' })}<div class="sound-shell glass reveal"><div class="video-frame"><iframe src="https://www.youtube.com/embed/hu2nJCrIzno" title="Friday The 14th official video by DFB" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><div class="sound-copy"><span class="release-type">◉ Official Video / Music Release</span><h3>Friday The 14th</h3><p>Culture inside the DFB universe: not a separate artist page, but the pulse behind the systems and visuals.</p><div class="dsp-row">${dspButtons.map((label) => `<!-- Placeholder DSP link until official URL is supplied. --><a href="#">${label}</a>`).join('')}</div><div class="button-row"><a class="btn primary" href="https://youtu.be/hu2nJCrIzno?si=tytmkSBqa44IgSWj" target="_blank" rel="noreferrer">▶ Watch Video</a><a class="btn secondary" href="#sound">Stream Music</a><a class="btn ghost" href="#media">View Artist Media</a></div></div></div></div></section>`;
+}
