@@ -29,6 +29,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .reveal { opacity: 1; transform: none; transition: opacity .65s ease, transform .65s ease; }
 .motion-ready .reveal { opacity: 1; transform: translateY(18px); }
 .motion-ready .reveal.is-visible { opacity: 1; transform: translateY(0); }
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity .65s ease, transform .65s ease; }
+.reveal.is-visible { opacity: 1; transform: translateY(0); }
 .ambient { pointer-events: none; position: absolute; inset: 0; overflow: hidden; }
 .ambient span { position: absolute; border-radius: 999px; filter: blur(70px); opacity: .55; }
 .ambient span:nth-child(1) { width: 42rem; height: 42rem; left: 50%; top: 0; transform: translateX(-50%); background: rgba(40,200,255,.14); }

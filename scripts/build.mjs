@@ -54,3 +54,10 @@ for (const outputDir of ['dist', 'public']) {
   await cp('src', `${outputDir}/src`, { recursive: true });
 }
 console.log('Built prerendered static DFB Solutions site into dist/ and public/');
+import { cp, mkdir, rm } from 'node:fs/promises';
+
+await rm('dist', { recursive: true, force: true });
+await mkdir('dist/src', { recursive: true });
+await cp('index.html', 'dist/index.html');
+await cp('src', 'dist/src', { recursive: true });
+console.log('Built static DFB Solutions site into dist/');
