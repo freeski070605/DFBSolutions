@@ -4,6 +4,7 @@ import { extname, join, resolve } from 'node:path';
 
 const root = resolve(process.argv[2] || '.');
 const port = process.env.PORT || 5173;
+const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml' };
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.jsx': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml' };
 
 createServer((req, res) => {
