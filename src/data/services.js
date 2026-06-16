@@ -73,7 +73,7 @@ export const services = [
     items: [
       "Study apps",
       "Booking systems",
-      "Dashboards",
+      "Digital workspaces",
       "Game concepts",
       "MVP planning",
       "Internal tools",
@@ -84,13 +84,13 @@ export const services = [
     title: "AI / Automation Workflows",
     icon: Bot,
     description:
-      "Creative and business pipelines that reduce busywork and sharpen output.",
+      "Creative and business workflows that reduce busywork and sharpen output.",
     items: [
       "Content systems",
       "Media workflows",
       "Business automations",
       "Clip engines",
-      "Creative pipelines",
+      "Studio workflows",
       "Productivity tools",
     ],
   },
@@ -113,9 +113,9 @@ export const lanes = [
     tone: "green",
   },
   {
-    title: "Launch The System",
+    title: "Launch The Tool",
     subtitle:
-      "Apps, dashboards, booking tools, study apps, MVP maps, automations, and digital workflows.",
+      "Apps, booking tools, study apps, MVP maps, automations, and digital workflows.",
     cta: "Start A Build",
     href: "#start-project",
     tone: "chrome",

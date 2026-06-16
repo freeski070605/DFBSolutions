@@ -33,7 +33,7 @@ export default function Footer() {
       <div className="mx-auto flex max-w-7xl flex-col gap-3 border-t border-white/10 px-4 py-6 text-xs text-slate-500 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
         <p>© {new Date().getFullYear()} DFB Solutions. Built from scratch.</p>
         <a href="#home" className="focus-ring inline-flex items-center gap-2 rounded text-slate-300 hover:text-white">
-          Back to Control Room <ArrowUpRight size={14} aria-hidden="true" />
+          Back to Creative Studio <ArrowUpRight size={14} aria-hidden="true" />
         </a>
       </div>
     </footer>

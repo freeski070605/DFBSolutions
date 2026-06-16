@@ -1,6 +1,6 @@
 import AnimatedGridBackground from "./components/AnimatedGridBackground.jsx";
 import Navbar from "./components/Navbar.jsx";
-import HeroControlRoom from "./components/HeroControlRoom.jsx";
+import HeroCreativeWall from "./components/HeroCreativeWall.jsx";
 import LaneSelector from "./components/LaneSelector.jsx";
 import ServicesCommandCenter from "./components/ServicesCommandCenter.jsx";
 import FeaturedBuilds from "./components/FeaturedBuilds.jsx";
@@ -17,7 +17,7 @@ export default function App() {
       <AnimatedGridBackground />
       <Navbar />
       <main>
-        <HeroControlRoom />
+        <HeroCreativeWall />
         <LaneSelector />
         <ServicesCommandCenter />
         <FeaturedBuilds />
