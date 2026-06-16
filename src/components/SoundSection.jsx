@@ -1,15 +1,8 @@
 import { motion } from "framer-motion";
-import { Music2, Play, Radio } from "lucide-react";
+import { Music2, Play } from "lucide-react";
 import SectionHeader from "./SectionHeader.jsx";
 
-const dspLinks = [
-  "Spotify",
-  "Apple Music",
-  "YouTube Music",
-  "Tidal",
-  "Audiomack",
-  "SoundCloud",
-];
+const dspLinks = [];
 
 const youtubeUrl = "https://youtu.be/hu2nJCrIzno?si=tytmkSBqa44IgSWj";
 
@@ -66,22 +59,19 @@ export default function SoundSection() {
               Culture inside the DFB universe: music as memory, message, and
               motion behind the builds.
             </p>
-            <div className="mt-7 grid grid-cols-2 gap-2">
-              {dspLinks.map((service) => (
-                // Replace placeholder hrefs with exact DSP links when available.
-                <a key={service} href="#" className="stream-link">
-                  {service}
-                </a>
-              ))}
-            </div>
+            {dspLinks.length > 0 && (
+              <div className="mt-7 grid grid-cols-2 gap-2">
+                {dspLinks.map((service) => (
+                  <a key={service.label} href={service.url} className="stream-link" target="_blank" rel="noreferrer">
+                    {service.label}
+                  </a>
+                ))}
+              </div>
+            )}
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a href={youtubeUrl} className="btn-primary" target="_blank" rel="noreferrer">
                 <Play size={18} aria-hidden="true" />
                 Watch Video
-              </a>
-              <a href="#" className="btn-secondary">
-                <Radio size={18} aria-hidden="true" />
-                Stream Music
               </a>
               <a href="#media" className="btn-ghost">
                 View Artist Media

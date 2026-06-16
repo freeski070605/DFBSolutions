@@ -1,6 +1,13 @@
 import { ArrowUpRight } from "lucide-react";
 
-const explore = ["Work With Us", "Builds", "Lab", "Media", "Sound"];
+const explore = [
+  ["Work With Us", "#services"],
+  ["Builds", "#featured-builds"],
+  ["Lab", "#lab"],
+  ["Media", "#media"],
+  ["Sound", "#sound"],
+];
+
 const services = [
   "Photography",
   "Branding",
@@ -9,7 +16,6 @@ const services = [
   "Apps & Tools",
   "AI Workflows",
 ];
-const connect = ["Email placeholder", "Instagram placeholder", "YouTube placeholder", "TikTok placeholder"];
 
 export default function Footer() {
   return (
@@ -26,9 +32,20 @@ export default function Footer() {
             Street-Born. Studio-Built. Tech-Powered.
           </p>
         </div>
-        <FooterColumn title="Explore" items={explore} />
-        <FooterColumn title="Services" items={services} />
-        <FooterColumn title="Connect" items={connect} />
+        <FooterLinks title="Explore" items={explore} />
+        <FooterText title="Services" items={services} />
+        <div>
+          <h3 className="text-xs font-black uppercase tracking-[0.22em] text-slate-500">
+            Connect
+          </h3>
+          <p className="mt-4 max-w-xs text-sm leading-6 text-slate-300">
+            Use the project form to start visual work, brand assets, builds, media,
+            music support, or AI workflow planning.
+          </p>
+          <a href="#start-project" className="micro-cta mt-5">
+            Start A Project
+          </a>
+        </div>
       </div>
       <div className="mx-auto flex max-w-7xl flex-col gap-3 border-t border-white/10 px-4 py-6 text-xs text-slate-500 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
         <p>© {new Date().getFullYear()} DFB Solutions. Built from scratch.</p>
@@ -40,7 +57,26 @@ export default function Footer() {
   );
 }
 
-function FooterColumn({ title, items }) {
+function FooterLinks({ title, items }) {
+  return (
+    <div>
+      <h3 className="text-xs font-black uppercase tracking-[0.22em] text-slate-500">
+        {title}
+      </h3>
+      <ul className="mt-4 grid gap-2">
+        {items.map(([item, href]) => (
+          <li key={item}>
+            <a href={href} className="focus-ring inline-flex rounded text-sm text-slate-300 hover:text-white">
+              {item}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function FooterText({ title, items }) {
   return (
     <div>
       <h3 className="text-xs font-black uppercase tracking-[0.22em] text-slate-500">
@@ -48,10 +84,8 @@ function FooterColumn({ title, items }) {
       </h3>
       <ul className="mt-4 grid gap-2">
         {items.map((item) => (
-          <li key={item}>
-            <a href="#" className="focus-ring inline-flex rounded text-sm text-slate-300 hover:text-white">
-              {item}
-            </a>
+          <li key={item} className="text-sm text-slate-300">
+            {item}
           </li>
         ))}
       </ul>

@@ -16,7 +16,7 @@ const collageCards = [
     subtitle: "Wedding / Event / Brand Visuals",
     icon: Camera,
     className:
-      "col-span-2 bg-gradient-to-br from-sky-400/24 via-white/[0.08] to-black/50 sm:left-[3%] sm:top-[8%] sm:w-[48%] sm:rotate-[-5deg] lg:left-[2%] lg:top-[9%]",
+      "bg-gradient-to-br from-sky-400/24 via-white/[0.08] to-black/50 sm:left-[3%] sm:top-[8%] sm:w-[48%] sm:rotate-[-5deg] lg:left-[2%] lg:top-[9%]",
     visual: "photo",
   },
   {
@@ -61,9 +61,11 @@ const collageCards = [
   },
 ];
 
+const proofTags = ["Photography", "Branding", "Apps", "Music", "Media", "AI Workflows"];
+
 export default function HeroCreativeWall() {
   return (
-    <section id="home" className="section-shell relative min-h-screen overflow-hidden pt-32">
+    <section id="home" className="section-shell relative min-h-screen overflow-hidden pt-28 sm:pt-32">
       <div className="absolute inset-x-0 top-20 h-72 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,.11),transparent_58%)]" />
       <div className="mx-auto grid min-w-0 max-w-7xl items-center gap-12 px-4 pb-20 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
         <motion.div
@@ -72,10 +74,10 @@ export default function HeroCreativeWall() {
           transition={{ duration: 0.7 }}
           className="relative z-10 min-w-0 max-w-[22.5rem] sm:max-w-none"
         >
-          <p className="mb-5 text-xs font-black uppercase tracking-[0.28em] text-signal">
+          <p className="mb-5 text-xs font-black uppercase tracking-[0.28em] text-signal sm:mb-6">
             DFB SOLUTIONS
           </p>
-          <h1 className="max-w-5xl break-words font-display text-[2.55rem] font-black uppercase leading-[0.92] text-white min-[420px]:text-[2.75rem] sm:text-7xl lg:text-8xl">
+          <h1 className="max-w-5xl break-words font-display text-[2.75rem] font-black uppercase leading-[0.96] text-white min-[420px]:text-5xl sm:text-7xl sm:leading-[0.9] lg:text-8xl">
             Where Ideas Become Assets.
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-xl sm:leading-8">
@@ -97,8 +99,15 @@ export default function HeroCreativeWall() {
               Start A Build
             </a>
           </div>
-          <div className="mt-8 border-l border-white/15 pl-4 text-xs font-black uppercase tracking-[0.18em] text-slate-400 sm:text-sm">
-            Photography / Branding / Apps / Music / Media / AI Workflows
+          <div className="mt-8 flex max-w-xl flex-wrap gap-2">
+            {proofTags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full border border-white/10 bg-white/[0.055] px-3 py-2 text-[0.68rem] font-black uppercase tracking-[0.14em] text-slate-300 backdrop-blur"
+              >
+                {tag}
+              </span>
+            ))}
           </div>
         </motion.div>
 
@@ -111,7 +120,7 @@ export default function HeroCreativeWall() {
 function CreativeCollage() {
   return (
     <motion.div
-      className="relative z-10 mx-auto grid min-w-0 w-full max-w-[22.5rem] grid-cols-2 gap-3 sm:block sm:min-h-[680px] sm:max-w-[680px] lg:min-h-[760px]"
+      className="relative z-10 mx-auto grid min-w-0 w-full max-w-[22.5rem] grid-cols-1 gap-3 sm:block sm:min-h-[680px] sm:max-w-[680px] lg:min-h-[760px]"
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.7, delay: 0.12 }}
@@ -135,7 +144,7 @@ function CollageCard({ card, index }) {
 
   return (
     <motion.article
-      className={`group relative overflow-hidden rounded-2xl border border-white/[0.14] p-4 shadow-2xl backdrop-blur-xl sm:absolute sm:p-5 ${card.className}`}
+      className={`group relative ${index > 2 ? "hidden sm:block" : ""} overflow-hidden rounded-2xl border border-white/[0.14] p-4 shadow-2xl backdrop-blur-xl sm:absolute sm:p-5 ${card.className}`}
       animate={{ y: [0, index % 2 ? -10 : 10, 0] }}
       transition={{
         duration: 5.2 + index * 0.35,
