@@ -1,11 +1,11 @@
 import { ArrowUpRight } from "lucide-react";
 
 const explore = [
-  ["Work With Us", "#services"],
-  ["Builds", "#featured-builds"],
-  ["Lab", "#lab"],
-  ["Media", "#media"],
-  ["Sound", "#sound"],
+  ["Work With Us", "/#services"],
+  ["Builds", "/#featured-builds"],
+  ["Lab", "/#lab"],
+  ["Media", "/#media"],
+  ["Sound", "/sound"],
 ];
 
 const services = [
