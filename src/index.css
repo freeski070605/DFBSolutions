@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  background: #04070d;
+  font-family: Inter, Aptos, system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(53, 167, 255, 0.18), transparent 28%),
+    radial-gradient(circle at 80% 0%, rgba(50, 255, 157, 0.11), transparent 24%),
+    #04070d;
+  font-family: Inter, Aptos, system-ui, sans-serif;
+}
+
+::selection {
+  background: rgba(50, 255, 157, 0.32);
+  color: white;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@layer components {
+  .section-shell {
+    @apply relative z-10 scroll-mt-20;
+  }
+
+  .focus-ring {
+    @apply outline-none transition focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 focus-visible:ring-offset-ink;
+  }
+
+  .nav-link {
+    @apply focus-ring rounded-lg px-3 py-2 text-xs font-black uppercase tracking-[0.16em] text-slate-300 hover:bg-white/10 hover:text-white;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost {
+    @apply focus-ring inline-flex min-h-12 items-center gap-2 rounded-lg px-5 py-3 text-sm font-black uppercase tracking-[0.14em] transition;
+  }
+
+  .btn-primary {
+    @apply border border-signal/45 bg-signal text-black shadow-signal hover:bg-emerald-200;
+  }
+
+  .btn-secondary {
+    @apply border border-voltage/40 bg-voltage/[0.12] text-sky-100 shadow-glow hover:bg-voltage/20;
+  }
+
+  .btn-ghost {
+    @apply border border-white/15 bg-white/[0.06] text-white hover:bg-white/[0.12];
+  }
+
+  .glass-panel {
+    @apply border border-white/[0.12] bg-panel-glow shadow-2xl backdrop-blur-xl;
+  }
+
+  .lane-card {
+    @apply focus-ring relative min-h-[360px] overflow-hidden border border-white/[0.12] bg-white/[0.055] p-6 backdrop-blur transition;
+  }
+
+  .lane-card::before,
+  .command-card::before,
+  .project-card::before,
+  .lab-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 30px 30px;
+    mask-image: linear-gradient(180deg, black, transparent 80%);
+    opacity: 0.42;
+  }
+
+  .lane-blue {
+    @apply hover:border-voltage/60 hover:shadow-glow;
+  }
+
+  .lane-green {
+    @apply hover:border-signal/60 hover:shadow-signal;
+  }
+
+  .lane-chrome {
+    @apply hover:border-white/35 hover:shadow-2xl;
+  }
+
+  .lane-heat {
+    @apply hover:border-heat/60 hover:shadow-[0_0_34px_rgba(255,179,71,.18)];
+  }
+
+  .command-card,
+  .project-card,
+  .lab-card,
+  .receipt-card {
+    @apply relative overflow-hidden border border-white/[0.12] bg-white/[0.055] p-5 backdrop-blur transition;
+  }
+
+  .command-card {
+    @apply min-h-[460px] hover:border-voltage/45 hover:bg-voltage/[0.08];
+  }
+
+  .project-card {
+    @apply hover:border-signal/45 hover:bg-white/[0.075];
+  }
+
+  .lab-card {
+    @apply min-h-[290px] bg-black/30 hover:border-signal/45;
+  }
+
+  .receipt-card {
+    @apply min-h-[175px] bg-gradient-to-br from-white/[0.085] to-white/[0.025] hover:border-voltage/45;
+  }
+
+  .micro-cta {
+    @apply focus-ring inline-flex items-center gap-2 rounded-md border border-white/[0.12] bg-white/[0.06] px-3 py-2 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:border-signal/45 hover:bg-signal/10;
+  }
+
+  .media-tile {
+    @apply relative min-h-[280px] overflow-hidden border border-white/[0.12] bg-black/30 p-5 transition hover:border-heat/50;
+  }
+
+  .stream-link {
+    @apply focus-ring rounded-md border border-white/10 bg-white/[0.05] px-3 py-3 text-center text-xs font-black uppercase tracking-[0.12em] text-slate-200 transition hover:border-signal/45 hover:text-white;
+  }
+
+  .field-label {
+    @apply grid gap-2 text-xs font-black uppercase tracking-[0.16em] text-slate-400;
+  }
+
+  .field-control {
+    @apply focus-ring min-h-12 w-full rounded-lg border border-white/[0.12] bg-black/30 px-4 py-3 text-base normal-case tracking-normal text-white placeholder:text-slate-500;
+  }
+}
+
+.noise-layer {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+}
+
+@media (max-width: 480px) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost {
+    width: 100%;
+    justify-content: center;
+    letter-spacing: 0.08em;
+  }
+}
