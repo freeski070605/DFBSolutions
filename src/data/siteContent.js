@@ -2,6 +2,7 @@ import {
   Bot,
   BriefcaseBusiness,
   CalendarCheck,
+  Camera,
   ChartNoAxesCombined,
   ClipboardList,
   Component,
@@ -11,12 +12,64 @@ import {
   Layers3,
   Megaphone,
   Paintbrush,
+  Play,
   Rocket,
   Sparkles,
   Store,
   Users,
+  Video,
   Wrench,
 } from "lucide-react";
+
+export const serviceLanes = [
+  {
+    title: "Digital Builds",
+    icon: Component,
+    outcome:
+      "Websites, booking systems, admin dashboards, apps, CRM systems, AI tools, and business tools that make the idea usable.",
+    includes: [
+      "Business websites",
+      "Booking systems",
+      "Admin dashboards",
+      "Custom apps",
+      "CRM/customer systems",
+      "AI workflows",
+    ],
+    projectType: "Website",
+  },
+  {
+    title: "Creative Production",
+    icon: Video,
+    outcome:
+      "Photography and video work that gives brands, artists, businesses, and events real visual proof.",
+    includes: [
+      "Photography",
+      "Videography",
+      "Music videos",
+      "Event recap videos",
+      "Business promo videos",
+      "Brand/content shoots",
+      "Short-form reels",
+      "YouTube video work",
+    ],
+    projectType: "Videography",
+  },
+  {
+    title: "Brand & Launch Systems",
+    icon: Rocket,
+    outcome:
+      "The launch structure around the work: landing pages, content planning, rollout assets, lead capture, automation, and systems that help you move faster.",
+    includes: [
+      "Landing pages",
+      "Content planning",
+      "Rollout assets",
+      "Lead capture",
+      "Launch automations",
+      "Social media content capture",
+    ],
+    projectType: "Brand/content shoot",
+  },
+];
 
 export const services = [
   {
@@ -83,6 +136,14 @@ export const services = [
     includes: ["Promo graphics", "Flyers", "Brand kits", "Social assets"],
     projectType: "Content/brand visuals",
   },
+  {
+    title: "Photography & Videography",
+    icon: Camera,
+    outcome:
+      "Real photo and video coverage for brands, artists, businesses, events, and launches that need to look official.",
+    includes: ["Shoots", "Recaps", "Promos", "Reels"],
+    projectType: "Photography",
+  },
 ];
 
 export const audiences = [
@@ -110,6 +171,86 @@ export const audiences = [
     title: "System Builders",
     icon: Wrench,
     copy: "People who do not just need a design. They need dashboards, customer flows, automation, and repeatable operations.",
+  },
+];
+
+export const creativeWork = [
+  {
+    title: "Music Videos On YouTube",
+    client: "DFB / Artist Visuals",
+    category: "Music Video",
+    youtubeUrl: "",
+    thumbnailUrl: "",
+    description:
+      "A video-ready portfolio slot for real music videos, performance visuals, and artist releases hosted on YouTube.",
+    year: "Add year",
+    featured: true,
+  },
+  {
+    title: "Event Recap Videos",
+    client: "Events / Local Brands",
+    category: "Event Recap",
+    youtubeUrl: "",
+    thumbnailUrl: "",
+    description:
+      "Recap edits for events, pop-ups, community moments, launches, and behind-the-scenes brand activity.",
+    year: "Add year",
+    featured: false,
+  },
+  {
+    title: "Wedding Photography",
+    client: "Private Events",
+    category: "Photography",
+    youtubeUrl: "",
+    thumbnailUrl: "",
+    description:
+      "Photo coverage for real moments, families, celebrations, portraits, and event memories.",
+    year: "Add year",
+    featured: false,
+  },
+  {
+    title: "Clothing Pop-Up Recap",
+    client: "Clothing Brands",
+    category: "Brand Content",
+    youtubeUrl: "",
+    thumbnailUrl: "",
+    description:
+      "Social-ready recap content for brand activations, vendor setups, customer moments, and launch energy.",
+    year: "Add year",
+    featured: false,
+  },
+  {
+    title: "Business Promo Videos",
+    client: "Service Brands",
+    category: "Business Promo",
+    youtubeUrl: "",
+    thumbnailUrl: "",
+    description:
+      "Promo visuals for service providers and local businesses that need to show the offer clearly.",
+    year: "Add year",
+    featured: false,
+  },
+  {
+    title: "Brand / Content Shoots",
+    client: "Creators & Entrepreneurs",
+    category: "Brand Content",
+    youtubeUrl: "",
+    thumbnailUrl: "",
+    description:
+      "Photo and video capture for content calendars, social platforms, launch assets, reels, and YouTube visuals.",
+    year: "Add year",
+    featured: false,
+  },
+  {
+    title: "Artist Visuals",
+    client: "Artists",
+    category: "YouTube Video",
+    youtubeUrl: "",
+    thumbnailUrl: "",
+    description:
+      "Visual content for artists who need official video assets, behind-the-scenes content, and release support.",
+    year: "Add year",
+    featured: false,
   },
 ];
 
@@ -213,6 +354,12 @@ export const offers = [
     details: ["Hooks and captions", "Promo visuals", "Campaign rhythm", "Reusable system"],
   },
   {
+    title: "Photo/Video Content Package",
+    label: "Custom Quote",
+    fit: "Shoots, recaps, promos, reels, and visuals for brands, artists, businesses, and events.",
+    details: ["Photography", "Videography", "Event recaps", "Social-ready deliverables"],
+  },
+  {
     title: "AI Workflow Setup",
     label: "Custom Quote",
     fit: "For businesses that need automation, internal tools, dashboards, or smarter workflows.",
@@ -227,15 +374,15 @@ export const processSteps = [
   },
   {
     title: "Plan",
-    copy: "We turn the idea into scope, priorities, screens, content, and a real build path.",
+    copy: "We turn the idea into scope, priorities, screens, shot needs, content, and a real build path.",
   },
   {
     title: "Build",
-    copy: "Design, code, systems, copy, and workflow pieces start becoming something usable.",
+    copy: "Design, code, systems, copy, and creative direction start becoming something usable.",
   },
   {
     title: "Launch",
-    copy: "The first public or private version goes live with the essentials handled cleanly.",
+    copy: "The site, system, visuals, or campaign goes live with the essentials handled cleanly.",
   },
   {
     title: "Improve",
@@ -244,10 +391,10 @@ export const processSteps = [
 ];
 
 export const proofStats = [
-  ["Idea", "to execution"],
-  ["Sites", "apps, systems"],
-  ["Design", "code, content"],
-  ["Lead", "capture ready"],
+  ["Build", "sites, apps, tools"],
+  ["Capture", "photo and video"],
+  ["Launch", "content, systems"],
+  ["Official", "brand presence"],
 ];
 
 export const projectTypeOptions = [
@@ -255,7 +402,12 @@ export const projectTypeOptions = [
   "Booking system",
   "Admin dashboard",
   "Custom app",
-  "Content/brand visuals",
+  "Photography",
+  "Videography",
+  "Event recap",
+  "Music video",
+  "Brand/content shoot",
+  "Business promo video",
   "AI workflow",
   "Not sure yet",
 ];
@@ -271,6 +423,8 @@ export const budgetOptions = [
 export const heroSignals = [
   { label: "Websites", icon: Globe2 },
   { label: "Apps", icon: Component },
+  { label: "Photo Shoots", icon: Camera },
+  { label: "Video Work", icon: Play },
   { label: "Dashboards", icon: ClipboardList },
   { label: "AI Workflows", icon: Bot },
   { label: "Launch Assets", icon: Sparkles },

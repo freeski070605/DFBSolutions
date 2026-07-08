@@ -9,12 +9,12 @@ const explore = [
 ];
 
 const services = [
-  "Business Websites",
-  "Booking Apps",
-  "Admin Dashboards",
-  "Custom Apps",
-  "Content Systems",
-  "AI Workflows",
+  "Digital Builds",
+  "Photography",
+  "Videography",
+  "Music Videos",
+  "Event Recaps",
+  "Launch Systems",
 ];
 
 export default function Footer() {
@@ -26,10 +26,10 @@ export default function Footer() {
             DFB Solutions
           </h2>
           <p className="mt-4 text-sm leading-6 text-slate-300">
-            DFB Solutions turns ideas into official digital products, brands, and systems.
+            DFB Solutions helps clients build it, capture it, and launch it.
           </p>
           <p className="mt-2 text-xs font-black uppercase tracking-[0.2em] text-signal">
-            You bring the idea. DFB makes it real.
+            Websites. Apps. Visuals. Systems.
           </p>
         </div>
         <FooterLinks title="Explore" items={explore} />
@@ -39,7 +39,7 @@ export default function Footer() {
             Connect
           </h3>
           <p className="mt-4 max-w-xs text-sm leading-6 text-slate-300">
-            Use the project form to start a website, app, booking system, dashboard,
+            Use the project form to start a website, app, shoot, recap, promo video,
             content engine, or AI workflow.
           </p>
           <a href="#start-project" className="micro-cta mt-5">

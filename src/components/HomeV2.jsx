@@ -2,9 +2,11 @@ import { motion } from "framer-motion";
 import {
   ArrowDown,
   ArrowUpRight,
+  Camera,
   Check,
   ChevronRight,
   Clock3,
+  Play,
   Send,
   Sparkles,
   Target,
@@ -13,13 +15,14 @@ import { useEffect, useState } from "react";
 import {
   audiences,
   budgetOptions,
+  creativeWork,
   heroSignals,
   offers,
   processSteps,
   projects,
   projectTypeOptions,
   proofStats,
-  services,
+  serviceLanes,
 } from "../data/siteContent.js";
 import SectionHeader from "./SectionHeader.jsx";
 import StatusPill from "./StatusPill.jsx";
@@ -33,6 +36,12 @@ const initialFormState = (projectType = "Not sure yet") => ({
   budget: "",
   timeline: "",
   links: "",
+  shootDate: "",
+  shootLocation: "",
+  contentType: "",
+  deliverables: "",
+  platforms: "",
+  referenceLink: "",
   message: "",
   companyWebsite: "",
 });
@@ -72,18 +81,25 @@ function HeroSection() {
           <h1 className="max-w-5xl break-words font-display text-[2.65rem] font-black uppercase leading-[0.96] text-white min-[420px]:text-5xl sm:text-7xl sm:leading-[0.9] lg:text-8xl">
             Stop sitting on the idea. Let&apos;s build it into something real.
           </h1>
+          <p className="mt-5 max-w-3xl font-display text-2xl font-black uppercase leading-tight text-white sm:text-4xl">
+            Websites. Apps. Visuals. Systems. Built for people ready to look official.
+          </p>
           <p className="mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-xl sm:leading-8">
-            DFB Solutions helps creators, service businesses, artists, and entrepreneurs launch clean
-            websites, apps, content systems, and AI-powered tools without looking basic or sounding corporate.
+            DFB Solutions helps creators, service businesses, artists, and entrepreneurs turn ideas into real
+            websites, apps, content, visuals, and business systems.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <a href="#start-project" className="btn-primary">
               <Sparkles size={18} aria-hidden="true" />
               Start My Build
             </a>
-            <a href="#work" className="btn-secondary">
-              <ArrowDown size={18} aria-hidden="true" />
-              See The Work
+            <a href="#watch-the-work" className="btn-secondary">
+              <Play size={18} aria-hidden="true" />
+              Watch The Work
+            </a>
+            <a href="#start-project?projectType=Photography" className="btn-ghost">
+              <Camera size={18} aria-hidden="true" />
+              Book A Shoot
             </a>
           </div>
           <div className="mt-8 grid max-w-2xl grid-cols-2 gap-2 sm:grid-cols-4">
@@ -112,7 +128,7 @@ function HeroSection() {
                   Build Board
                 </span>
                 <span className="border border-signal/30 bg-signal/10 px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-signal">
-                  Idea To Execution
+                  Build. Capture. Launch.
                 </span>
               </div>
               <div className="grid gap-3">
@@ -150,11 +166,11 @@ function ServicesSection() {
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <SectionHeader
           eyebrow="What We Build"
-          title="Digital products, brands, and systems that make the idea official."
-          subtitle="Every build is shaped around the outcome: more trust, cleaner operations, better launches, stronger follow-up, and a sharper next step."
+          title="Three lanes. One studio. Build it, capture it, launch it."
+          subtitle="DFB brings the digital system and the visual proof together so the brand does not feel half-finished."
         />
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {services.map((service, index) => (
+        <div className="grid gap-4 lg:grid-cols-3">
+          {serviceLanes.map((service, index) => (
             <ServiceOutcomeCard key={service.title} service={service} index={index} />
           ))}
         </div>
@@ -169,7 +185,7 @@ function ServiceOutcomeCard({ service, index }) {
 
   return (
     <motion.article
-      className="command-card min-h-[350px]"
+      className="command-card min-h-[420px]"
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
@@ -243,8 +259,8 @@ function PortfolioSection() {
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <SectionHeader
           eyebrow="Featured Builds"
-          title="Proof that DFB is more than web design."
-          subtitle="A portfolio of live, internal, in-progress, and prototype builds that show the studio range: games, beauty tech, dashboards, apps, and the DFB platform itself."
+          title="Real work. Real builds. Real visuals."
+          subtitle="DFB creates both the digital systems and the visual proof that make brands look official: websites, apps, dashboards, content, photography, video, and launch assets."
           align="center"
         />
         <div className="grid gap-4 lg:grid-cols-2">
@@ -252,8 +268,86 @@ function PortfolioSection() {
             <ProjectV2Card key={project.title} project={project} index={index} />
           ))}
         </div>
+        <WatchTheWork />
       </div>
     </section>
+  );
+}
+
+function WatchTheWork() {
+  return (
+    <div id="watch-the-work" className="mt-16 scroll-mt-24">
+      <SectionHeader
+        eyebrow="Watch The Work"
+        title="Video, photo, and content work belongs beside the builds."
+        subtitle="This section is ready for real YouTube links, thumbnails, and photo/video portfolio items as they get added."
+        align="center"
+      />
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {creativeWork.map((item, index) => (
+          <CreativeWorkCard key={item.title} item={item} index={index} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CreativeWorkCard({ item, index }) {
+  const embedUrl = getYouTubeEmbedUrl(item.youtubeUrl);
+  const thumbnailUrl = item.thumbnailUrl || getYouTubeThumbnailUrl(item.youtubeUrl);
+
+  return (
+    <motion.article
+      className={`project-card bg-gradient-to-br from-heat/[0.11] via-white/[0.045] to-black/25 ${item.featured ? "xl:col-span-2" : ""}`}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.5, delay: index * 0.04 }}
+      whileHover={{ y: -7 }}
+    >
+      <div className="mb-5 aspect-video overflow-hidden border border-white/10 bg-black/35">
+        {embedUrl ? (
+          <iframe
+            className="h-full w-full"
+            src={embedUrl}
+            title={item.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
+        ) : thumbnailUrl ? (
+          <img src={thumbnailUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+        ) : (
+          <div className="grid h-full place-items-center bg-[radial-gradient(circle_at_30%_20%,rgba(255,179,71,.25),transparent_32%),linear-gradient(135deg,rgba(255,255,255,.08),rgba(0,0,0,.2))]">
+            <Play size={44} className="text-heat" aria-hidden="true" />
+          </div>
+        )}
+      </div>
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-heat">
+            {item.category}
+          </p>
+          <h3 className="mt-2 font-display text-2xl font-black uppercase leading-none text-white">
+            {item.title}
+          </h3>
+        </div>
+        <StatusPill tone={item.youtubeUrl ? "green" : "chrome"}>
+          {item.youtubeUrl ? item.year : "Add Link"}
+        </StatusPill>
+      </div>
+      <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{item.client}</p>
+      <p className="mt-3 text-sm leading-6 text-slate-300">{item.description}</p>
+      <a
+        href={item.youtubeUrl || "#start-project?projectType=Videography"}
+        className="micro-cta mt-6"
+        target={item.youtubeUrl ? "_blank" : undefined}
+        rel={item.youtubeUrl ? "noreferrer" : undefined}
+      >
+        <ArrowUpRight size={16} aria-hidden="true" />
+        {item.youtubeUrl ? "Watch On YouTube" : "Portfolio Slot Ready"}
+      </a>
+    </motion.article>
   );
 }
 
@@ -313,7 +407,7 @@ function OffersSection() {
           title="Pick the level that matches the move."
           subtitle="No fake pricing theater. Some builds are quick launches. Some are systems. The intake gets the right conversation started."
         />
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {offers.map((offer, index) => (
             <motion.article
               key={offer.title}
@@ -356,7 +450,7 @@ function ProcessSection() {
         <SectionHeader
           eyebrow="Process"
           title="From idea to execution without endless talking."
-          subtitle="The process is simple on purpose. DFB helps you identify the next real step, build it, launch it, then improve it."
+          subtitle="The process is simple on purpose. DFB helps you identify the next real step, build it, capture it, launch it, then improve it."
           align="center"
         />
         <div className="grid gap-3 md:grid-cols-5">
@@ -402,7 +496,8 @@ function MomentumSection() {
             <p className="mt-5 max-w-3xl text-base leading-7 text-slate-300 sm:text-lg">
               Most people do not need more motivation. They need structure, direction, and someone who can
               turn the idea into the next real step. DFB is built for that moment: when you are tired of
-              thinking about the thing and ready to see it on a screen, in a system, or in front of customers.
+              thinking about the thing and ready to see it on a screen, in a system, through real visuals,
+              or in front of customers.
             </p>
             <a href="#start-project" className="btn-primary mt-7">
               <Clock3 size={18} aria-hidden="true" />
@@ -422,10 +517,10 @@ function AboutSection() {
         <SectionHeader
           eyebrow="About DFB"
           title="A creative-tech studio for real people building real things."
-          subtitle="DFB Solutions helps turn ideas into usable digital products, brands, and systems. The studio bridges design, code, content, and business systems so creators, founders, and local operators can move with more clarity."
+          subtitle="DFB Solutions helps clients build it, capture it, and launch it. The studio bridges design, code, photography, videography, content, and business systems so creators, founders, and local operators can move with more clarity."
         />
         <div className="grid gap-4 sm:grid-cols-2">
-          {["Design that looks official", "Code that works in the real world", "Content systems with rhythm", "Business workflows with structure"].map((item) => (
+          {["Design that looks official", "Code that works in the real world", "Photo and video that prove the brand", "Business workflows with structure"].map((item) => (
             <div key={item} className="border border-white/[0.12] bg-white/[0.055] p-5">
               <Check size={18} className="text-signal" aria-hidden="true" />
               <p className="mt-3 text-sm font-black uppercase tracking-[0.12em] text-white">{item}</p>
@@ -512,11 +607,11 @@ function IntakeSection() {
             <SectionHeader
               eyebrow="Start A Project"
               title="You bring the idea. DFB makes it real."
-              subtitle="Tell me what you are building, where it is stuck, and what needs to happen next. The form routes into the existing DFB contact endpoint."
+              subtitle="Tell me what you are building, what you need captured, where it is stuck, and what needs to happen next. The form routes into the existing DFB contact endpoint."
             />
             <div className="border border-white/10 bg-black/30 p-5 text-sm leading-6 text-slate-300">
               Best inputs: what you need built, who it is for, links to what exists now, your ideal timeline,
-              and what would make the project feel like a win.
+              shoot details if production is involved, and what would make the project feel like a win.
             </div>
           </div>
 
@@ -540,6 +635,18 @@ function IntakeSection() {
               <Field label="Timeline" name="timeline" maxLength={100} onChange={handleChange} required value={form.timeline} />
             </div>
             <Field label="Current website or links, optional" name="links" maxLength={500} onChange={handleChange} value={form.links} />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Shoot date, optional" name="shootDate" maxLength={100} onChange={handleChange} value={form.shootDate} />
+              <Field label="Shoot location, optional" name="shootLocation" maxLength={180} onChange={handleChange} value={form.shootLocation} />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Type of content needed, optional" name="contentType" maxLength={220} onChange={handleChange} value={form.contentType} />
+              <Field label="Final deliverables needed, optional" name="deliverables" maxLength={260} onChange={handleChange} value={form.deliverables} />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Social platforms this is for, optional" name="platforms" maxLength={220} onChange={handleChange} value={form.platforms} />
+              <Field label="YouTube or reference link, optional" name="referenceLink" maxLength={500} onChange={handleChange} value={form.referenceLink} />
+            </div>
             <label className="field-label">
               Message / details
               <textarea
@@ -585,6 +692,38 @@ function IntakeSection() {
       </div>
     </section>
   );
+}
+
+function getYouTubeEmbedUrl(url) {
+  const id = getYouTubeId(url);
+  return id ? `https://www.youtube.com/embed/${id}` : "";
+}
+
+function getYouTubeThumbnailUrl(url) {
+  const id = getYouTubeId(url);
+  return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : "";
+}
+
+function getYouTubeId(url) {
+  if (!url) {
+    return "";
+  }
+
+  try {
+    const parsed = new URL(url);
+
+    if (parsed.hostname.includes("youtu.be")) {
+      return parsed.pathname.replace("/", "");
+    }
+
+    if (parsed.hostname.includes("youtube.com")) {
+      return parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop() || "";
+    }
+  } catch (error) {
+    return "";
+  }
+
+  return "";
 }
 
 function Field({ label, name, type = "text", ...props }) {

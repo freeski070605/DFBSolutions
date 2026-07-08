@@ -9,6 +9,12 @@ const FIELD_LIMITS = {
   budget: 100,
   timeline: 100,
   links: 500,
+  shootDate: 100,
+  shootLocation: 180,
+  contentType: 220,
+  deliverables: 260,
+  platforms: 220,
+  referenceLink: 500,
   message: 3000,
 };
 
@@ -228,6 +234,12 @@ function buildHtmlEmail(fields, submittedAt) {
     ["Budget", fields.budget],
     ["Timeline", fields.timeline],
     ["Current website or links", fields.links || "Not provided"],
+    ["Shoot date", fields.shootDate || "Not provided"],
+    ["Shoot location", fields.shootLocation || "Not provided"],
+    ["Type of content needed", fields.contentType || "Not provided"],
+    ["Final deliverables needed", fields.deliverables || "Not provided"],
+    ["Social platforms", fields.platforms || "Not provided"],
+    ["YouTube or reference link", fields.referenceLink || "Not provided"],
     ["Message", fields.message],
     ["Submitted timestamp", submittedAt],
     ["Source", "DFB Solutions Website"],
@@ -271,6 +283,12 @@ function buildTextEmail(fields, submittedAt) {
     `Budget: ${fields.budget}`,
     `Timeline: ${fields.timeline}`,
     `Current website or links: ${fields.links || "Not provided"}`,
+    `Shoot date: ${fields.shootDate || "Not provided"}`,
+    `Shoot location: ${fields.shootLocation || "Not provided"}`,
+    `Type of content needed: ${fields.contentType || "Not provided"}`,
+    `Final deliverables needed: ${fields.deliverables || "Not provided"}`,
+    `Social platforms: ${fields.platforms || "Not provided"}`,
+    `YouTube or reference link: ${fields.referenceLink || "Not provided"}`,
     `Message: ${fields.message}`,
     `Submitted timestamp: ${submittedAt}`,
     "Source: DFB Solutions Website",
@@ -290,6 +308,10 @@ function formatFieldName(field) {
   const labels = {
     businessName: "Business / brand name",
     projectType: "Project type",
+    shootDate: "Shoot date",
+    shootLocation: "Shoot location",
+    contentType: "Type of content needed",
+    referenceLink: "YouTube or reference link",
   };
 
   return labels[field] || `${field.charAt(0).toUpperCase()}${field.slice(1)}`;
