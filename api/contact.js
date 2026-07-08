@@ -3,14 +3,16 @@ import { Resend } from "resend";
 const FIELD_LIMITS = {
   name: 120,
   email: 200,
+  businessName: 160,
   need: 300,
   projectType: 100,
   budget: 100,
   timeline: 100,
+  links: 500,
   message: 3000,
 };
 
-const REQUIRED_FIELDS = ["name", "email", "projectType", "message"];
+const REQUIRED_FIELDS = ["name", "email", "need", "projectType", "budget", "timeline", "message"];
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default async function handler(req, res) {
@@ -220,10 +222,12 @@ function buildHtmlEmail(fields, submittedAt) {
   const rows = [
     ["Name", fields.name],
     ["Email", fields.email],
-    ["What they need", fields.need || "Not provided"],
+    ["Business / brand name", fields.businessName || "Not provided"],
+    ["What they need built", fields.need],
     ["Project type", fields.projectType],
-    ["Budget", fields.budget || "Not provided"],
-    ["Timeline", fields.timeline || "Not provided"],
+    ["Budget", fields.budget],
+    ["Timeline", fields.timeline],
+    ["Current website or links", fields.links || "Not provided"],
     ["Message", fields.message],
     ["Submitted timestamp", submittedAt],
     ["Source", "DFB Solutions Website"],
@@ -261,10 +265,12 @@ function buildTextEmail(fields, submittedAt) {
     "",
     `Name: ${fields.name}`,
     `Email: ${fields.email}`,
-    `What they need: ${fields.need || "Not provided"}`,
+    `Business / brand name: ${fields.businessName || "Not provided"}`,
+    `What they need built: ${fields.need}`,
     `Project type: ${fields.projectType}`,
-    `Budget: ${fields.budget || "Not provided"}`,
-    `Timeline: ${fields.timeline || "Not provided"}`,
+    `Budget: ${fields.budget}`,
+    `Timeline: ${fields.timeline}`,
+    `Current website or links: ${fields.links || "Not provided"}`,
     `Message: ${fields.message}`,
     `Submitted timestamp: ${submittedAt}`,
     "Source: DFB Solutions Website",
@@ -282,6 +288,7 @@ function escapeHtml(value) {
 
 function formatFieldName(field) {
   const labels = {
+    businessName: "Business / brand name",
     projectType: "Project type",
   };
 

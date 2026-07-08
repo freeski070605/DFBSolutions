@@ -6,10 +6,10 @@ import { scrollToHash } from "../utils/navigation.js";
 
 const navItems = [
   ["Home", "/", null],
-  ["Work With Us", "/", "#services"],
-  ["Builds", "/", "#featured-builds"],
-  ["Lab", "/", "#lab"],
-  ["Media", "/", "#media"],
+  ["Services", "/", "#services"],
+  ["Work", "/", "#work"],
+  ["Process", "/", "#process"],
+  ["Start a Project", "/", "#start-project"],
   ["Sound", "/sound", null],
 ];
 
@@ -86,7 +86,7 @@ export default function Navbar() {
 
         <a href="/#start-project" onClick={handleStartProject} className="btn-primary hidden lg:inline-flex">
           <Rocket size={17} aria-hidden="true" />
-          Start Project
+          Start My Build
         </a>
 
         <button
@@ -126,7 +126,7 @@ export default function Navbar() {
                 className="btn-primary mt-2 justify-center"
               >
                 <Rocket size={17} aria-hidden="true" />
-                Start Project
+                Start My Build
               </a>
             </div>
           </motion.div>
