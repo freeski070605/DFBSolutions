@@ -2,11 +2,31 @@
   "rewrites": [
     {
       "source": "/sitemap.xml",
-      "destination": "/api/sitemap"
+      "destination": "/api/index?route=sitemap"
     },
     {
       "source": "/robots.txt",
-      "destination": "/api/robots"
+      "destination": "/api/index?route=robots"
+    },
+    {
+      "source": "/api/auth/:path*",
+      "destination": "/api/index?route=auth/:path*"
+    },
+    {
+      "source": "/api/admin/:path*",
+      "destination": "/api/index?route=admin/:path*"
+    },
+    {
+      "source": "/api/content/:path*",
+      "destination": "/api/index?route=content/:path*"
+    },
+    {
+      "source": "/api/contact",
+      "destination": "/api/index?route=contact"
+    },
+    {
+      "source": "/api/join-free-list",
+      "destination": "/api/index?route=join-free-list"
     },
     {
       "source": "/((?!api/).*)",

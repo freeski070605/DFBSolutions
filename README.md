@@ -113,6 +113,8 @@ Never expose or commit real API keys. Keep real values in `.env` locally and Ver
 
 ## API Routes
 
+All public API URLs are dispatched through one consolidated Vercel Function at `api/index.js`. Route implementations and shared database code live under `server/api/`, outside Vercel's deployable `/api` directory. This keeps the deployment within the Hobby plan's Serverless Function count while preserving the URLs below.
+
 ### `/api/contact`
 
 Handles the main DFB Solutions Start Project form.

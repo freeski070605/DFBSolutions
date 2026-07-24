@@ -1,8 +1,8 @@
 import { requireAdmin } from "../_lib/auth.js";
 import { getDb } from "../_lib/db.js";
 import { json } from "../_lib/http.js";
-import { projects } from "../../src/data/projects.js";
-import { divisions } from "../../src/data/divisions.js";
+import { projects } from "../../../src/data/projects.js";
+import { divisions } from "../../../src/data/divisions.js";
 
 export default async function handler(req, res) {
   const admin = await requireAdmin(req, res);
