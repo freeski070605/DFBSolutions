@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { getDb } from "./_lib/db.js";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const TYPE_LABELS = {
@@ -74,12 +75,33 @@ export default async function handler(req, res) {
     if (value) fields[key] = value;
   }
 
+  let inquiryId;
+  try {
+    const db = await getDb();
+    const result = await db.collection("inquiries").insertOne({
+      inquiryType,
+      status: "new",
+      name,
+      email,
+      phone: fields.phone || "",
+      details: Object.fromEntries(Object.entries(fields).filter(([key]) => !["name", "email", "phone"].includes(key))),
+      source: "website",
+      notes: "",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    inquiryId = result.insertedId;
+  } catch (error) {
+    console.error("Contact inquiry persistence failed.", { message: error?.message, inquiryType });
+    return res.status(503).json({ success: false, message: "Your request could not be saved. Please try again." });
+  }
+
   const resendApiKey = process.env.RESEND_API_KEY;
   const toEmail = process.env.CONTACT_TO_EMAIL;
   const fromEmail = process.env.CONTACT_FROM_EMAIL;
   if (!resendApiKey || !toEmail || !fromEmail) {
-    console.error("Contact delivery configuration is incomplete.");
-    return res.status(503).json({ success: false, message: "Message delivery is not configured yet. Please try again later." });
+    console.warn("Inquiry was saved, but contact email delivery is not configured.", { inquiryId, inquiryType });
+    return res.status(201).json({ success: true, message: "Request saved." });
   }
 
   const rows = Object.entries(fields);
@@ -102,10 +124,11 @@ export default async function handler(req, res) {
     });
     if (error) throw new Error(error.message);
     console.info("DFB inquiry accepted for delivery.", { id: data?.id, inquiryType });
-    return res.status(200).json({ success: true, message: "Request delivered." });
+    await (await getDb()).collection("inquiries").updateOne({ _id: inquiryId }, { $set: { emailDeliveredAt: new Date() } });
+    return res.status(201).json({ success: true, message: "Request saved and delivered." });
   } catch (error) {
-    console.error("DFB inquiry delivery failed.", { message: error?.message, inquiryType });
-    return res.status(500).json({ success: false, message: "Your request could not be delivered. Please try again." });
+    console.error("Inquiry saved, but email delivery failed.", { message: error?.message, inquiryId, inquiryType });
+    return res.status(201).json({ success: true, message: "Request saved." });
   }
 }
 

@@ -3,12 +3,14 @@ import { Navigate, Link, useParams } from "react-router-dom";
 import FaqList from "../components/FaqList.jsx";
 import ProjectCard from "../components/ProjectCard.jsx";
 import Seo from "../components/Seo.jsx";
-import { getDivision } from "../data/divisions.js";
-import { projects } from "../data/projects.js";
+import { useDivisions } from "../context/DivisionsContext.jsx";
+import { useProjects } from "../context/ProjectsContext.jsx";
 
 export default function DivisionPage() {
   const { slug } = useParams();
-  const division = getDivision(slug);
+  const { divisions } = useDivisions();
+  const division = divisions.find((item) => item.slug === slug);
+  const { projects } = useProjects();
   if (!division) return <Navigate to="/404" replace />;
   const Icon = division.icon;
   const work = projects.filter((project) => project.division === division.slug);

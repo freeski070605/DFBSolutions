@@ -3,7 +3,7 @@ import { useEffect } from "react";
 const siteName = "DFB Solutions";
 const defaultDescription = "DFB Solutions builds digital products, produces creative content, improves properties, and coordinates transportation around the problem in front of us.";
 
-export default function Seo({ title, description = defaultDescription }) {
+export default function Seo({ title, description = defaultDescription, noindex = false }) {
   useEffect(() => {
     const fullTitle = title ? `${title} | ${siteName}` : `${siteName} | Every Problem Has a Solution`;
     document.title = fullTitle;
@@ -12,7 +12,8 @@ export default function Seo({ title, description = defaultDescription }) {
     setMeta("property", "og:description", description);
     setMeta("property", "og:type", "website");
     setMeta("property", "og:url", window.location.href);
-  }, [title, description]);
+    setMeta("name", "robots", noindex ? "noindex, nofollow" : "index, follow");
+  }, [title, description, noindex]);
 
   return null;
 }

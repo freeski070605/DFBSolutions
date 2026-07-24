@@ -2,7 +2,7 @@ import { ArrowRight, CheckCircle2, Send } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Seo from "../components/Seo.jsx";
-import { divisions } from "../data/divisions.js";
+import { useDivisions } from "../context/DivisionsContext.jsx";
 
 const types = [
   ["digital", "Digital project"],
@@ -57,6 +57,7 @@ const fieldSets = {
 };
 
 export default function ContactPage() {
+  const { divisions } = useDivisions();
   const [searchParams] = useSearchParams();
   const initialType = types.some(([key]) => key === searchParams.get("type")) ? searchParams.get("type") : "";
   const [type, setType] = useState(initialType);

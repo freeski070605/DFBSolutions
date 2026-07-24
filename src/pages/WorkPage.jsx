@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
 import ProjectCard from "../components/ProjectCard.jsx";
 import Seo from "../components/Seo.jsx";
-import { projects } from "../data/projects.js";
+import { useProjects } from "../context/ProjectsContext.jsx";
 
 const filters = ["all", "digital", "creative", "property", "transportation"];
 
 export default function WorkPage() {
+  const { projects } = useProjects();
   const [filter, setFilter] = useState("all");
   const visible = useMemo(() => filter === "all" ? projects : projects.filter((project) => project.division === filter), [filter]);
   return (

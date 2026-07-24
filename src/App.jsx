@@ -3,6 +3,7 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import Footer from "./components/Footer.jsx";
 import Navbar from "./components/Navbar.jsx";
 import AboutPage from "./pages/AboutPage.jsx";
+import AdminPage from "./pages/AdminPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
 import DivisionPage from "./pages/DivisionPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
@@ -14,6 +15,7 @@ import WorkPage from "./pages/WorkPage.jsx";
 
 export default function App() {
   const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/admin");
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -28,10 +30,11 @@ export default function App() {
 
   return (
     <div className="site-frame">
-      <a className="skip-link" href="#main-content">Skip to content</a>
-      <Navbar />
+      {!isAdmin && <a className="skip-link" href="#main-content">Skip to content</a>}
+      {!isAdmin && <Navbar />}
       <div id="main-content">
         <Routes>
+          <Route path="/admin/*" element={<AdminPage />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/solutions/:slug" element={<DivisionPage />} />
           <Route path="/work" element={<WorkPage />} />
@@ -45,7 +48,7 @@ export default function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
-      <Footer />
+      {!isAdmin && <Footer />}
     </div>
   );
 }

@@ -3,10 +3,12 @@ import { Link } from "react-router-dom";
 import ProjectCard from "../components/ProjectCard.jsx";
 import Seo from "../components/Seo.jsx";
 import SolutionFinder from "../components/SolutionFinder.jsx";
-import { divisions } from "../data/divisions.js";
-import { projects } from "../data/projects.js";
+import { useDivisions } from "../context/DivisionsContext.jsx";
+import { useProjects } from "../context/ProjectsContext.jsx";
 
 export default function HomePage() {
+  const { projects } = useProjects();
+  const { divisions } = useDivisions();
   return (
     <>
       <Seo />

@@ -6,12 +6,13 @@ export default function ProjectCard({ project, index = 0 }) {
   return (
     <article className="project-tile group">
       <div className="project-visual" style={{ "--accent": project.accent }}>
+        {project.coverImage && <img src={project.coverImage} alt={`${project.title} project cover`} loading="lazy" />}
         <span className="project-index">{String(index + 1).padStart(2, "0")}</span>
-        <div className="project-mark" aria-hidden="true">
+        {!project.coverImage && <div className="project-mark" aria-hidden="true">
           <i />
           <i />
           <i />
-        </div>
+        </div>}
         <span className="project-category">{project.category}</span>
       </div>
       <div className="project-body">

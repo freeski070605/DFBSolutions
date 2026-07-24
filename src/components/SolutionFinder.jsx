@@ -1,7 +1,7 @@
 import { ArrowRight, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { divisions } from "../data/divisions.js";
+import { useDivisions } from "../context/DivisionsContext.jsx";
 
 const options = [
   ["digital", "I need a website, app, or business system", "What needs to work better?", ["Launch a new idea", "Improve an existing platform", "Organize a workflow"]],
@@ -12,6 +12,7 @@ const options = [
 ];
 
 export default function SolutionFinder({ compact = false }) {
+  const { divisions } = useDivisions();
   const [choice, setChoice] = useState("");
   const [detail, setDetail] = useState("");
   const selected = options.find(([key]) => key === choice);

@@ -1,8 +1,9 @@
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { divisions } from "../data/divisions.js";
+import { useDivisions } from "../context/DivisionsContext.jsx";
 
 export default function Footer() {
+  const { divisions } = useDivisions();
   return (
     <footer className="site-footer">
       <div className="footer-lead">

@@ -2,9 +2,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { divisions } from "../data/divisions.js";
+import { useDivisions } from "../context/DivisionsContext.jsx";
 
 export default function Navbar() {
+  const { divisions } = useDivisions();
   const [open, setOpen] = useState(false);
   const [solutionsOpen, setSolutionsOpen] = useState(false);
   const location = useLocation();
