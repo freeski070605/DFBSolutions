@@ -1,0 +1,78 @@
+import { Camera, Code2, Hammer, Route } from "lucide-react";
+
+export const divisions = [
+  {
+    slug: "digital",
+    name: "Digital Solutions",
+    shortName: "Digital",
+    icon: Code2,
+    accent: "#cfff45",
+    statement: "Systems built around how your work actually works.",
+    prompt: "I need to build, improve, or organize something online.",
+    intro: "Custom websites, platforms, and software designed to solve business, operational, customer, and entertainment problems.",
+    problems: ["A business needs a credible home online", "A manual workflow needs a better system", "Customers need a clearer way to book or interact", "An original product idea needs structure and a working interface"],
+    capabilities: ["Custom websites", "Web applications", "Booking systems", "Customer portals", "CRM systems", "Dashboards", "Internal tools", "Workflow automation", "Platform improvements"],
+    process: ["Map the people and workflow", "Define the useful core", "Design and build the system", "Test, launch, and support"],
+    faqs: [
+      ["Can you improve an existing platform?", "Yes. DFB can assess what exists, identify the highest-value improvements, and plan a focused path forward."],
+      ["Do I need a complete technical plan?", "No. Start with the problem, the people it affects, and what a better outcome should feel like."],
+      ["Do you maintain projects after launch?", "Maintenance and next-step support can be scoped around the platform and your operating needs."],
+    ],
+  },
+  {
+    slug: "creative",
+    name: "Creative Solutions",
+    shortName: "Creative",
+    icon: Camera,
+    accent: "#ffb85c",
+    statement: "Stories captured. Moments preserved. Brands brought to life.",
+    prompt: "I need something captured, produced, or presented professionally.",
+    intro: "Professional photography and video production for meaningful moments, artists, athletes, families, and brands.",
+    problems: ["A milestone deserves thoughtful coverage", "An athlete needs focused performance visuals", "A song needs a visual world", "A brand needs content that feels intentional"],
+    capabilities: ["Photography", "Videography", "Event coverage", "Wedding and prom coverage", "Sports and athlete highlights", "Music videos", "Brand content", "Promotional video", "Editing", "Short-form content"],
+    process: ["Understand the moment and audience", "Plan the coverage or treatment", "Capture with purpose", "Edit and deliver the final story"],
+    faqs: [
+      ["Do you offer photo and video together?", "Yes. Coverage can be shaped around photography, video, or both, depending on the event and deliverables."],
+      ["How early should I inquire?", "As early as practical, especially for a fixed event date. Availability and scope are confirmed during planning."],
+      ["Can you create social-ready edits?", "Yes. Short-form and platform-ready deliverables can be included in the project scope."],
+    ],
+  },
+  {
+    slug: "property",
+    name: "Property Solutions",
+    shortName: "Property",
+    icon: Hammer,
+    accent: "#77d9c5",
+    statement: "Practical improvements built with purpose.",
+    prompt: "I need something repaired, improved, or built.",
+    intro: "Focused residential and property-improvement work for contained repairs, useful upgrades, and custom project requests.",
+    problems: ["A damaged area needs a practical repair", "A small exterior space needs to work better", "An installation or assembly needs a capable hand", "A custom improvement needs a clear scope"],
+    capabilities: ["Deck platforms and small exterior builds", "Drywall repair", "Minor property improvements", "Assembly and installation", "Practical repair solutions", "Custom project requests"],
+    process: ["Review the issue and location", "Confirm a safe, realistic scope", "Plan materials and timing", "Complete and review the work"],
+    faqs: [
+      ["What types of projects are a fit?", "DFB focuses on contained improvements such as deck platforms, drywall repair, assembly, installation, and practical custom requests."],
+      ["Can I send photos first?", "Yes. Photos help with an initial review, though an in-person assessment may still be needed before scope is confirmed."],
+      ["Do you perform licensed trade work?", "DFB does not advertise electrical, plumbing, roofing, structural engineering, or other licensed trade work through this division."],
+    ],
+  },
+  {
+    slug: "transportation",
+    name: "Transportation Solutions",
+    shortName: "Transportation",
+    icon: Route,
+    accent: "#9fa9ff",
+    statement: "Your group, your itinerary, one coordinated solution.",
+    prompt: "I need people moved safely and efficiently.",
+    intro: "Transportation and trip-logistics support centered on dependable planning, clear communication, and custom itineraries.",
+    problems: ["A group needs coordinated event transportation", "A trip includes several stops or moving parts", "Guests need a clear point-to-point plan", "An itinerary needs transportation built around it"],
+    capabilities: ["Private group transportation", "Event transportation", "Wedding and prom transportation", "Concert and birthday transportation", "Day trips", "Multi-stop itineraries", "Group-trip coordination", "Custom transportation requests"],
+    process: ["Understand the group and occasion", "Review pickup, route, stops, and timing", "Confirm the coordinated plan", "Execute with clear trip communication"],
+    faqs: [
+      ["Can you plan a multi-stop itinerary?", "Yes. Share the known stops, timing, group size, and any special requests so the trip can be reviewed as one plan."],
+      ["Are fuel and tolls included?", "Packages can account for fuel and tolls where applicable. The exact terms are confirmed with the itinerary."],
+      ["Does my itinerary need to be final?", "No. An early request can start with the date, cities, expected group size, and the stops you already know."],
+    ],
+  },
+];
+
+export const getDivision = (slug) => divisions.find((division) => division.slug === slug);

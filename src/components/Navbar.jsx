@@ -1,134 +1,91 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, Rocket, X } from "lucide-react";
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { scrollToHash } from "../utils/navigation.js";
-
-const navItems = [
-  ["Home", "/", null],
-  ["Services", "/", "#services"],
-  ["Work", "/", "#work"],
-  ["Process", "/", "#process"],
-  ["Start a Project", "/", "#start-project"],
-  ["Sound", "/sound", null],
-];
+import { ChevronDown, Menu, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { divisions } from "../data/divisions.js";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
+  const [solutionsOpen, setSolutionsOpen] = useState(false);
   const location = useLocation();
+  const menuRef = useRef(null);
 
-  function handleNav(event, path, hash) {
+  useEffect(() => {
     setOpen(false);
+    setSolutionsOpen(false);
+  }, [location.pathname, location.hash]);
 
-    if (!hash) {
-      return;
+  useEffect(() => {
+    function closeOnEscape(event) {
+      if (event.key === "Escape") {
+        setOpen(false);
+        setSolutionsOpen(false);
+      }
     }
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, []);
 
-    event.preventDefault();
-
-    if (location.pathname !== path) {
-      navigate(`${path}${hash}`);
-      window.setTimeout(() => scrollToHash(hash), 80);
-      return;
+  useEffect(() => {
+    function closeOnOutsideClick(event) {
+      if (solutionsOpen && menuRef.current && !menuRef.current.contains(event.target)) {
+        setSolutionsOpen(false);
+      }
     }
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    return () => document.removeEventListener("pointerdown", closeOnOutsideClick);
+  }, [solutionsOpen]);
 
-    window.history.replaceState(null, "", `${path}${hash}`);
-    scrollToHash(hash);
-  }
-
-  function handleStartProject(event) {
-    event.preventDefault();
-    setOpen(false);
-
-    if (location.pathname !== "/") {
-      navigate("/#start-project");
-      window.setTimeout(() => scrollToHash("#start-project"), 80);
-      return;
-    }
-
-    window.history.replaceState(null, "", "/#start-project");
-    scrollToHash("#start-project");
-  }
+  const baseLinks = [["Home", "/"], ["Our Work", "/work"], ["About", "/about"], ["Contact", "/contact"]];
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-ink/72 backdrop-blur-xl">
-      <nav
-        aria-label="Primary navigation"
-        className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
-      >
-        <Link to="/" className="focus-ring group flex items-center gap-3 rounded-lg">
-          <span className="grid h-10 w-10 place-items-center border border-white/15 bg-white/10 font-display text-sm font-black text-white shadow-glow">
-            DFB
-          </span>
-          <span>
-            <span className="block font-display text-sm font-black uppercase tracking-[0.18em] text-white">
-              DFB Solutions
-            </span>
-            <span className="block text-[0.68rem] uppercase tracking-[0.18em] text-slate-400">
-              Creative-Tech Studio
-            </span>
-          </span>
+    <header className="site-header">
+      <nav className="nav-shell" aria-label="Primary navigation">
+        <Link className="brand" to="/" aria-label="DFB Solutions home">
+          <span className="brand-symbol">DFB<span>.</span></span>
+          <span className="brand-text">Solutions<small>Built around the problem</small></span>
         </Link>
-
-        <div className="hidden items-center gap-1 lg:flex">
-          {navItems.map(([label, path, hash]) => (
-            <Link
-              key={label}
-              to={`${path}${hash || ""}`}
-              onClick={(event) => handleNav(event, path, hash)}
-              className="nav-link"
+        <div className="desktop-nav">
+          <NavLink to="/" end>Home</NavLink>
+          <div className="solutions-menu" ref={menuRef}>
+            <button
+              type="button"
+              aria-haspopup="true"
+              aria-expanded={solutionsOpen}
+              onClick={() => setSolutionsOpen((value) => !value)}
             >
-              {label}
-            </Link>
-          ))}
+              Solutions <ChevronDown size={15} />
+            </button>
+            <AnimatePresence>
+              {solutionsOpen && (
+                <motion.div className="solutions-dropdown" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}>
+                  <p>Choose a path</p>
+                  {divisions.map((division) => (
+                    <Link key={division.slug} to={`/solutions/${division.slug}`}>
+                      <span style={{ background: division.accent }} />
+                      <div><strong>{division.name}</strong><small>{division.statement}</small></div>
+                    </Link>
+                  ))}
+                  <Link className="dropdown-finder" to="/#find-solution">Not sure? Find my solution →</Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          {baseLinks.slice(1).map(([label, path]) => <NavLink key={path} to={path}>{label}</NavLink>)}
         </div>
-
-        <a href="/#start-project" onClick={handleStartProject} className="btn-primary hidden lg:inline-flex">
-          <Rocket size={17} aria-hidden="true" />
-          Start My Build
-        </a>
-
-        <button
-          type="button"
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          onClick={() => setOpen((value) => !value)}
-          className="focus-ring inline-grid h-11 w-11 place-items-center rounded-lg border border-white/15 bg-white/10 text-white lg:hidden"
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
+        <Link className="btn btn-primary nav-cta" to="/#find-solution">Find My Solution</Link>
+        <button className="menu-toggle" type="button" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+          {open ? <X /> : <Menu />}
         </button>
       </nav>
-
       <AnimatePresence>
         {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.24 }}
-            className="overflow-hidden border-t border-white/10 bg-graphite/96 lg:hidden"
-          >
-            <div className="mx-auto grid max-w-7xl gap-2 px-4 py-4 sm:px-6">
-              {navItems.map(([label, path, hash]) => (
-                <Link
-                  key={label}
-                  to={`${path}${hash || ""}`}
-                  onClick={(event) => handleNav(event, path, hash)}
-                  className="focus-ring rounded-lg px-3 py-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-200 hover:bg-white/10"
-                >
-                  {label}
-                </Link>
-              ))}
-              <a
-                href="/#start-project"
-                onClick={handleStartProject}
-                className="btn-primary mt-2 justify-center"
-              >
-                <Rocket size={17} aria-hidden="true" />
-                Start My Build
-              </a>
-            </div>
+          <motion.div className="mobile-nav" initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }}>
+            <NavLink to="/" end>Home</NavLink>
+            <p>Solutions</p>
+            {divisions.map((division) => <NavLink className="mobile-solution" key={division.slug} to={`/solutions/${division.slug}`}>{division.name}</NavLink>)}
+            {baseLinks.slice(1).map(([label, path]) => <NavLink key={path} to={path}>{label}</NavLink>)}
+            <Link className="btn btn-primary" to="/#find-solution">Find My Solution</Link>
           </motion.div>
         )}
       </AnimatePresence>

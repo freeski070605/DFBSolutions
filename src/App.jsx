@@ -1,36 +1,51 @@
 import { useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
-import AnimatedGridBackground from "./components/AnimatedGridBackground.jsx";
-import Navbar from "./components/Navbar.jsx";
-import HomeV2 from "./components/HomeV2.jsx";
 import Footer from "./components/Footer.jsx";
+import Navbar from "./components/Navbar.jsx";
+import AboutPage from "./pages/AboutPage.jsx";
+import ContactPage from "./pages/ContactPage.jsx";
+import DivisionPage from "./pages/DivisionPage.jsx";
+import HomePage from "./pages/HomePage.jsx";
+import InfoPage from "./pages/InfoPage.jsx";
+import NotFoundPage from "./pages/NotFoundPage.jsx";
+import ProjectPage from "./pages/ProjectPage.jsx";
 import SoundPage from "./pages/SoundPage.jsx";
-import { scrollToHash } from "./utils/navigation.js";
+import WorkPage from "./pages/WorkPage.jsx";
 
 export default function App() {
   const location = useLocation();
 
   useEffect(() => {
-    window.setTimeout(() => scrollToHash(location.hash), 80);
+    const timer = window.setTimeout(() => {
+      if (location.hash) {
+        document.querySelector(location.hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
+    }, 40);
+    return () => window.clearTimeout(timer);
   }, [location.pathname, location.hash]);
 
   return (
-    <div className="min-h-screen overflow-hidden bg-ink text-slate-100">
-      <AnimatedGridBackground />
+    <div className="site-frame">
+      <a className="skip-link" href="#main-content">Skip to content</a>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/sound" element={<SoundPage />} />
-      </Routes>
-    </div>
-  );
-}
-
-function HomePage() {
-  return (
-    <>
-      <HomeV2 />
+      <div id="main-content">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/solutions/:slug" element={<DivisionPage />} />
+          <Route path="/work" element={<WorkPage />} />
+          <Route path="/work/:slug" element={<ProjectPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/privacy" element={<InfoPage kind="privacy" />} />
+          <Route path="/terms" element={<InfoPage kind="terms" />} />
+          <Route path="/sound" element={<SoundPage />} />
+          <Route path="/404" element={<NotFoundPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </div>
       <Footer />
-    </>
+    </div>
   );
 }
