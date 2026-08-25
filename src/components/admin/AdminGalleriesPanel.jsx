@@ -110,7 +110,7 @@ export default function AdminGalleriesPanel() {
               <div className="gallery-admin-actions">
                 <button onClick={() => setEditor({ event })}><Edit3 />Edit</button>
                 <button onClick={() => setResetting(event)}><KeyRound />Reset Code</button>
-                <button onClick={() => setConfirming(publishConfirmation(event))}>{event.published ? <EyeOff /> : <Eye />}{event.published ? "Unpublish" : "Publish"}</button>
+                {!event.archivedAt && <button onClick={() => setConfirming(publishConfirmation(event))}>{event.published ? <EyeOff /> : <Eye />}{event.published ? "Unpublish" : "Publish"}</button>}
                 <button className={event.archivedAt ? "" : "danger"} onClick={() => setConfirming(archiveConfirmation(event))}>
                   {event.archivedAt ? <RotateCcw /> : <Archive />}{event.archivedAt ? "Unarchive" : "Archive"}
                 </button>
@@ -177,7 +177,7 @@ function GalleryEditorModal({ event, onClose, onSave }) {
           {form.codeMode === "custom" && <label className="gallery-custom-code"><span>Custom event code<i>Required</i></span><input value={form.eventCode} required placeholder="EX: ANDREA80" autoCapitalize="characters" onChange={(e) => setForm({ ...form, eventCode: e.target.value.toUpperCase() })} /></label>}
         </fieldset>}
         <label className="admin-checkbox"><input type="checkbox" checked={form.downloadsEnabled} onChange={(e) => setForm({ ...form, downloadsEnabled: e.target.checked })} /><span>Allow Full-Resolution Downloads</span></label>
-        <label className="admin-checkbox"><input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} /><span>Published</span></label>
+        <label className="admin-checkbox"><input type="checkbox" checked={form.published} disabled={Boolean(event?.archivedAt)} onChange={(e) => setForm({ ...form, published: e.target.checked })} /><span>{event?.archivedAt ? "Published (Unarchive First)" : "Published"}</span></label>
       </div>
       {error && <p className="admin-message is-error" role="alert">{error}</p>}
       <footer><button className="btn btn-secondary" type="button" onClick={onClose} disabled={saving}>Cancel</button><button className="btn btn-primary" disabled={saving}>{saving ? "Saving…" : event ? "Save Changes" : "Create Event"}</button></footer>
