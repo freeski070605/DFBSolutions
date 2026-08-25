@@ -111,6 +111,26 @@ CONTACT_FROM_EMAIL=DFB Solutions <onboarding@resend.dev>
 
 Never expose or commit real API keys. Keep real values in `.env` locally and Vercel environment variables in production.
 
+## Client Gallery Infrastructure
+
+The private client-gallery foundation uses the existing MongoDB database and Vercel serverless backend with the private Cloudflare R2 bucket `dfb-client-galleries`. The bucket must remain private. Browser uploads and gallery delivery will use short-lived server-generated presigned URLs in later phases; application servers should not proxy large image bodies.
+
+Required server-side environment variables:
+
+```env
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=dfb-client-galleries
+R2_ENDPOINT=
+GALLERY_CODE_PEPPER=
+GALLERY_SESSION_SECRET=
+```
+
+Event codes are normalized and stored only as keyed HMAC-SHA256 lookup hashes. Temporary gallery authorization uses a separate `dfb_gallery_session` token and `GALLERY_SESSION_SECRET`; it does not grant admin access or reuse the `dfb_admin_session` cookie. The gallery cookie is scoped to `/api/gallery`, the narrowest path that will cover the later gallery API without sending it to unrelated application routes.
+
+The expected browser origins are `https://www.dfbsolutions.co` in production and `http://localhost:3000` for full-stack local development. R2 CORS is configured externally. Never commit `.env`, and never expose R2 credentials or gallery secrets through `VITE_` or any other client-visible environment variable.
+
 ## API Routes
 
 All public API URLs are dispatched through one consolidated Vercel Function at `api/index.js`. Route implementations and shared database code live under `server/api/`, outside Vercel's deployable `/api` directory. This keeps the deployment within the Hobby plan's Serverless Function count while preserving the URLs below.

@@ -30,15 +30,25 @@ export async function getDb() {
 }
 
 let indexesReady = false;
-async function ensureIndexes(db) {
+export const DATABASE_INDEXES = Object.freeze([
+  ["admins", { email: 1 }, { unique: true }],
+  ["projects", { slug: 1 }, { unique: true }],
+  ["inquiries", { createdAt: -1 }],
+  ["customers", { email: 1 }, { sparse: true }],
+  ["bookings", { startAt: 1 }],
+  ["login_attempts", { expiresAt: 1 }, { expireAfterSeconds: 0 }],
+  ["gallery_events", { codeHash: 1 }, { unique: true }],
+  ["gallery_events", { published: 1, archivedAt: 1, expiresAt: 1 }],
+  ["gallery_photos", { eventId: 1, status: 1, sortOrder: 1 }],
+  ["gallery_photos", { eventId: 1, _id: 1 }],
+  ["gallery_code_attempts", { identifierHash: 1 }, { unique: true }],
+  ["gallery_code_attempts", { expiresAt: 1 }, { expireAfterSeconds: 0 }],
+]);
+
+export async function ensureIndexes(db) {
   if (indexesReady) return;
-  await Promise.all([
-    db.collection("admins").createIndex({ email: 1 }, { unique: true }),
-    db.collection("projects").createIndex({ slug: 1 }, { unique: true }),
-    db.collection("inquiries").createIndex({ createdAt: -1 }),
-    db.collection("customers").createIndex({ email: 1 }, { sparse: true }),
-    db.collection("bookings").createIndex({ startAt: 1 }),
-    db.collection("login_attempts").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
-  ]);
+  await Promise.all(DATABASE_INDEXES.map(([collection, keys, options]) => (
+    db.collection(collection).createIndex(keys, options)
+  )));
   indexesReady = true;
 }
