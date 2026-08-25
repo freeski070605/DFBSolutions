@@ -1,10 +1,11 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import { getGalleryCodePepper } from "./galleryConfig.js";
 
 const MIN_CODE_LENGTH = 6;
 const MAX_CODE_LENGTH = 32;
 const CODE_PATTERN = /^[A-Z0-9-]+$/;
 const HASH_PATTERN = /^[a-f0-9]{64}$/;
+const GENERATED_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 export function normalizeGalleryCode(value) {
   if (typeof value !== "string") throw new TypeError("Gallery code must be a string.");
@@ -32,4 +33,17 @@ export function verifyGalleryCode(value, expectedHash) {
     return false;
   }
   return timingSafeEqual(Buffer.from(candidateHash, "hex"), Buffer.from(expectedHash, "hex"));
+}
+
+export function createGalleryCodeHint(value) {
+  const normalized = normalizeGalleryCode(value);
+  return `${"•".repeat(normalized.length - 2)}${normalized.slice(-2)}`;
+}
+
+export function generateGalleryCode() {
+  let randomPart = "";
+  for (let index = 0; index < 7; index += 1) {
+    randomPart += GENERATED_CODE_ALPHABET[randomInt(GENERATED_CODE_ALPHABET.length)];
+  }
+  return `DFB-${randomPart}`;
 }

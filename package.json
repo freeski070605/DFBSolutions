@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "validate:gallery": "node scripts/validate-gallery-foundation.js"
+    "validate:gallery": "node scripts/validate-gallery-foundation.js",
+    "validate:gallery:phase2": "node scripts/validate-gallery-phase2.js",
+    "validate:gallery:phase3": "node scripts/validate-gallery-phase3.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1118.0",

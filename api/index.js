@@ -9,6 +9,10 @@ import customersAdmin from "../server/api/admin/customers.js";
 import bookingsAdmin from "../server/api/admin/bookings.js";
 import overview from "../server/api/admin/overview.js";
 import seed from "../server/api/admin/seed.js";
+import galleriesAdmin from "../server/api/admin/galleries.js";
+import galleryAccess from "../server/api/gallery/access.js";
+import galleryLogout from "../server/api/gallery/logout.js";
+import gallerySession from "../server/api/gallery/session.js";
 import projectsPublic from "../server/api/content/projects.js";
 import divisionsPublic from "../server/api/content/divisions.js";
 import contact from "../server/api/contact.js";
@@ -28,6 +32,10 @@ const routes = {
   "admin/bookings": bookingsAdmin,
   "admin/overview": overview,
   "admin/seed": seed,
+  "admin/galleries": galleriesAdmin,
+  "gallery/access": galleryAccess,
+  "gallery/logout": galleryLogout,
+  "gallery/session": gallerySession,
   "content/projects": projectsPublic,
   "content/divisions": divisionsPublic,
   contact,

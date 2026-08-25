@@ -15,7 +15,7 @@ export const GALLERY_PHOTO_STATUSES = Object.freeze(["pending", "ready", "failed
 export function createGalleryEventRecord(input, { actor, now = new Date() } = {}) {
   if (!/^[a-f0-9]{64}$/.test(input?.codeHash || "")) throw new Error("A valid gallery code hash is required.");
   const title = cleanRequiredText(input?.title, 200, "Gallery title");
-  const eventDate = validDate(input?.eventDate, "Event date");
+  const eventDate = input?.eventDate == null || input.eventDate === "" ? null : validDate(input.eventDate, "Event date");
   const expiresAt = input?.expiresAt == null || input.expiresAt === "" ? null : validDate(input.expiresAt, "Expiration date");
   const createdAt = validDate(now, "Creation date");
   const createdBy = cleanRequiredText(actor, 200, "Creating administrator");
@@ -23,10 +23,12 @@ export function createGalleryEventRecord(input, { actor, now = new Date() } = {}
   return {
     ...GALLERY_EVENT_DEFAULTS,
     codeHash: input.codeHash,
-    codeHint: null,
+    codeHint: cleanCodeHint(input.codeHint),
     title,
     eventDate,
     expiresAt,
+    published: input.published ?? GALLERY_EVENT_DEFAULTS.published,
+    downloadsEnabled: input.downloadsEnabled ?? GALLERY_EVENT_DEFAULTS.downloadsEnabled,
     createdAt,
     updatedAt: createdAt,
     createdBy,
@@ -60,8 +62,21 @@ export function createGalleryPhotoRecord(input, { now = new Date() } = {}) {
 
 export function sanitizeGalleryEventForAdmin(event) {
   if (!event || typeof event !== "object") return null;
-  const { codeHash, ...safe } = event;
-  return safe;
+  return {
+    id: String(event._id),
+    title: event.title,
+    eventDate: event.eventDate ?? null,
+    expiresAt: event.expiresAt ?? null,
+    published: event.published === true,
+    archivedAt: event.archivedAt ?? null,
+    downloadsEnabled: event.downloadsEnabled !== false,
+    coverPhotoId: event.coverPhotoId ? String(event.coverPhotoId) : null,
+    photoCount: Number(event.photoCount) || 0,
+    codeHint: event.codeHint ?? null,
+    accessVersion: Number(event.accessVersion) || 1,
+    createdAt: event.createdAt,
+    updatedAt: event.updatedAt,
+  };
 }
 
 export function sanitizeGalleryEventForClient(event) {
@@ -108,6 +123,13 @@ function cleanRequiredText(value, max, label) {
 function cleanFilename(value) {
   const filename = typeof value === "string" ? value.replaceAll("\0", "").split(/[\\/]/).pop().trim() : "";
   return filename.slice(0, 255);
+}
+
+function cleanCodeHint(value) {
+  if (value == null) return null;
+  const hint = typeof value === "string" ? value.trim() : "";
+  if (!hint || hint.length > 32) throw new Error("Gallery code hint is invalid.");
+  return hint;
 }
 
 function positiveIntegerOrNull(value) {

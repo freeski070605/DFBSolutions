@@ -7,6 +7,7 @@ import AdminPage from "./pages/AdminPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
 import DivisionPage from "./pages/DivisionPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
+import GalleryPage from "./pages/GalleryPage.jsx";
 import InfoPage from "./pages/InfoPage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import ProjectPage from "./pages/ProjectPage.jsx";
@@ -41,6 +42,7 @@ export default function App() {
           <Route path="/work/:slug" element={<ProjectPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/privacy" element={<InfoPage kind="privacy" />} />
           <Route path="/terms" element={<InfoPage kind="terms" />} />
           <Route path="/sound" element={<SoundPage />} />

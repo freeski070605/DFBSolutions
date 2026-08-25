@@ -17,6 +17,10 @@
       "destination": "/api/index?route=admin/:path*"
     },
     {
+      "source": "/api/gallery/:path*",
+      "destination": "/api/index?route=gallery/:path*"
+    },
+    {
       "source": "/api/content/:path*",
       "destination": "/api/index?route=content/:path*"
     },

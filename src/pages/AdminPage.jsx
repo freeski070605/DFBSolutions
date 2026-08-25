@@ -1,5 +1,6 @@
-import { CalendarDays, FolderKanban, LayoutDashboard, LogOut, Menu, Search, Settings, Users, X } from "lucide-react";
+import { CalendarDays, FolderKanban, Images, LayoutDashboard, LogOut, Menu, Search, Settings, Users, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import AdminGalleriesPanel from "../components/admin/AdminGalleriesPanel.jsx";
 import Seo from "../components/Seo.jsx";
 
 const resources = {
@@ -89,11 +90,12 @@ export default function AdminPage() {
             const Icon = config.icon;
             return <button key={key} className={active === key ? "active" : ""} onClick={() => setActive(key)}><Icon />{config.label}</button>;
           })}
+          <button className={active === "galleries" ? "active" : ""} onClick={() => setActive("galleries")}><Images />Event Galleries</button>
         </nav>
         <div className="admin-user"><span>{user.name}</span><small>{user.email}</small><button onClick={logout}><LogOut size={15} />Sign out</button></div>
       </aside>
       <main className="admin-main">
-        {active === "overview" ? <Overview onNavigate={setActive} /> : <ResourcePanel key={active} resourceKey={active} config={resources[active]} />}
+        {active === "overview" ? <Overview onNavigate={setActive} /> : active === "galleries" ? <AdminGalleriesPanel /> : <ResourcePanel key={active} resourceKey={active} config={resources[active]} />}
       </main>
     </div>
   );

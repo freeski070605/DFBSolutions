@@ -16,7 +16,7 @@ export function hashGalleryAttemptIdentifier(identifier) {
 
 export async function checkGalleryCodeAttemptLimit(req, database) {
   const db = database || await getDb();
-  const identifierHash = hashGalleryAttemptIdentifier(getRequestIp(req));
+  const identifierHash = hashGalleryAttemptIdentifier(getGalleryRequestSource(req));
   const now = new Date();
   const record = await db.collection("gallery_code_attempts").findOne(
     { identifierHash, expiresAt: { $gt: now } },
@@ -29,6 +29,14 @@ export async function checkGalleryCodeAttemptLimit(req, database) {
     remaining: Math.max(0, GALLERY_ATTEMPT_LIMIT - failures),
     identifierHash,
   };
+}
+
+function getGalleryRequestSource(req) {
+  const vercelForwarded = req.headers?.["x-vercel-forwarded-for"];
+  if (typeof vercelForwarded === "string" && vercelForwarded.trim()) {
+    return vercelForwarded.split(",")[0].trim();
+  }
+  return getRequestIp(req);
 }
 
 export async function recordGalleryCodeFailure(identifierHash, database) {

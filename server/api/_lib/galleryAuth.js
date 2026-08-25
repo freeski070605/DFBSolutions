@@ -53,9 +53,10 @@ export async function readGallerySession(req) {
   return verifyGallerySessionToken(readCookie(req, GALLERY_SESSION_COOKIE));
 }
 
-export async function requireGalleryEventAccess(req, res, { requestedEventId, database } = {}) {
+export async function requireGalleryEventAccess(req, res, { requestedEventId, database, clearInvalidCookie = false } = {}) {
   const session = await readGallerySession(req);
   if (!session) {
+    if (clearInvalidCookie) clearGallerySession(res);
     json(res, 401, { success: false, message: "Gallery access is required." });
     return null;
   }
@@ -67,6 +68,7 @@ export async function requireGalleryEventAccess(req, res, { requestedEventId, da
   );
   const failure = getGalleryEventAccessFailure(session, event, { requestedEventId });
   if (failure) {
+    if (clearInvalidCookie) clearGallerySession(res);
     json(res, 403, { success: false, message: "Gallery access is no longer available." });
     return null;
   }
