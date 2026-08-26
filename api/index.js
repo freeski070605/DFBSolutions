@@ -55,10 +55,12 @@ const routes = {
 };
 
 export default async function handler(req, res) {
-  const routeValue = Array.isArray(req.query?.route) ? req.query.route.join("/") : req.query?.route;
+  const routeValue = queryValue(req.query?.route);
   const route = String(routeValue || "").replace(/^\/+|\/+$/g, "");
   const routeHandler = routes[route];
   if (!routeHandler) return res.status(404).json({ success: false, message: "API route not found." });
+
+  req.query = applicationQuery(req.query, route);
 
   try {
     return await routeHandler(req, res);
@@ -66,4 +68,18 @@ export default async function handler(req, res) {
     console.error("Consolidated API route failed.", { route, message: error?.message });
     if (!res.headersSent) return res.status(500).json({ success: false, message: "The request could not be completed." });
   }
+}
+
+function applicationQuery(query, route) {
+  const sanitized = { ...(query || {}) };
+  delete sanitized.route;
+
+  const wildcardPath = queryValue(sanitized.path);
+  const routePath = route.includes("/") ? route.slice(route.indexOf("/") + 1) : route;
+  if (wildcardPath === route || wildcardPath === routePath) delete sanitized.path;
+  return sanitized;
+}
+
+function queryValue(value) {
+  return Array.isArray(value) ? value.join("/") : value;
 }

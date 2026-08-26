@@ -20,17 +20,17 @@ export default async function handler(req, res) {
   res.setHeader("Cache-Control", "private, no-store");
   const db = await getDb();
   if (req.method === "GET") {
-    if (hasUnsupportedQuery(req, new Set(["route", "eventId", "page", "limit", "status"]))) return json(res, 400, { success: false, message: "Unsupported photo list query." });
+    if (hasUnsupportedQuery(req, new Set(["eventId", "page", "limit", "status"]))) return json(res, 400, { success: false, message: "Unsupported photo list query." });
     return listPhotos(req, res, db);
   }
   if (req.method === "POST") {
-    if (hasUnsupportedQuery(req, new Set(["route", "action"]))) return json(res, 400, { success: false, message: "Unsupported photo action query." });
+    if (hasUnsupportedQuery(req, new Set(["action"]))) return json(res, 400, { success: false, message: "Unsupported photo action query." });
     const action = cleanText(req.query?.action, 30);
     return action ? performAction(req, res, db, admin, action) : reservePhotos(req, res, db, admin);
   }
   if (req.method === "PUT") return reorderPhotos(req, res, db, admin);
   if (req.method === "DELETE") {
-    if (hasUnsupportedQuery(req, new Set(["route", "eventId", "photoId"]))) return json(res, 400, { success: false, message: "Unsupported photo deletion query." });
+    if (hasUnsupportedQuery(req, new Set(["eventId", "photoId"]))) return json(res, 400, { success: false, message: "Unsupported photo deletion query." });
     return deletePhoto(req, res, db, admin);
   }
   res.setHeader("Allow", "GET, POST, PUT, DELETE");

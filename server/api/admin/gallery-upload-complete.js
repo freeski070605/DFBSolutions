@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     res.setHeader("Allow", "POST");
     return json(res, 405, { success: false, message: "Method not allowed." });
   }
-  if (Object.keys(req.query || {}).some((key) => key !== "route")) return json(res, 400, { success: false, message: "Unsupported upload completion query." });
+  if (Object.keys(req.query || {}).length) return json(res, 400, { success: false, message: "Unsupported upload completion query." });
   const body = parseBody(req);
   const allowed = new Set(["eventId", "photoId", "width", "height"]);
   if (!body || typeof body !== "object" || Array.isArray(body) || Object.keys(body).some((key) => !allowed.has(key))) {

@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     res.setHeader("Allow", "GET");
     return json(res, 405, { success: false, message: "Method not allowed." });
   }
-  const allowedQuery = new Set(["route", "page", "limit"]);
+  const allowedQuery = new Set(["page", "limit"]);
   if (Object.keys(req.query || {}).some((key) => !allowedQuery.has(key))) return json(res, 400, { success: false, message: "Unsupported gallery photo query." });
   const event = await requireGalleryEventAccess(req, res, { clearInvalidCookie: true });
   if (!event) return;

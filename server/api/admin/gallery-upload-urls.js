@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     res.setHeader("Allow", "POST");
     return json(res, 405, { success: false, message: "Method not allowed." });
   }
-  if (Object.keys(req.query || {}).some((key) => key !== "route")) return json(res, 400, { success: false, message: "Unsupported upload permission query." });
+  if (Object.keys(req.query || {}).length) return json(res, 400, { success: false, message: "Unsupported upload permission query." });
   const body = parseBody(req);
   if (!validBody(body, new Set(["eventId", "photoIds"]))) return json(res, 400, { success: false, message: "Submit valid upload URL details." });
   const eventId = objectId(body.eventId);

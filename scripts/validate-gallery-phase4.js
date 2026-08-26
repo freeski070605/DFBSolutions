@@ -13,7 +13,8 @@ process.env.GALLERY_CODE_PEPPER = `phase-4-code-pepper-${runId}-long-enough`;
 process.env.GALLERY_SESSION_SECRET = `phase-4-session-secret-${runId}-long-enough`;
 process.env.NODE_ENV = "development";
 
-const [{ default: photosAdmin }, { default: uploadUrls }, { default: uploadComplete }, { default: publicPhotos }, { default: download }] = await Promise.all([
+const [{ default: api }, { default: photosAdmin }, { default: uploadUrls }, { default: uploadComplete }, { default: publicPhotos }, { default: download }] = await Promise.all([
+  import("../api/index.js"),
   import("../server/api/admin/gallery-photos.js"),
   import("../server/api/admin/gallery-upload-urls.js"),
   import("../server/api/admin/gallery-upload-complete.js"),
@@ -54,6 +55,37 @@ try {
   assert.equal((await invoke(photosAdmin, { method: "POST", headers: { ...adminHeaders, origin: "https://evil.example" }, body: {} })).statusCode, 403);
   assert.equal((await invoke(publicPhotos, { method: "GET" })).statusCode, 401);
   assert.equal((await invoke(download, { method: "POST", body: { photoId: String(new ObjectId()) } })).statusCode, 401);
+
+  const rewriteQuery = { route: "admin/gallery-photos", path: "gallery-photos" };
+  const rewrittenGet = await invoke(api, {
+    method: "GET",
+    query: { ...rewriteQuery, eventId: String(eventIds[0]), page: "1", limit: "60" },
+    headers: adminHeaders,
+  });
+  assert.equal(rewrittenGet.statusCode, 200);
+  const rewrittenPost = await invoke(api, {
+    method: "POST",
+    query: rewriteQuery,
+    body: { eventId: String(eventIds[0]), files: [{ clientId: `rewrite_${runId}`, originalFilename: "IMG_0001.JPG", mimeType: "image/jpeg", originalBytes: 128 }] },
+    headers: adminHeaders,
+  });
+  assert.equal(rewrittenPost.statusCode, 201);
+  await db.collection("gallery_photos").deleteOne({ _id: new ObjectId(rewrittenPost.body.items[0].id), eventId: eventIds[0] });
+  assert.equal((await invoke(api, {
+    method: "GET",
+    query: { ...rewriteQuery, eventId: String(eventIds[0]), unsupported: "true" },
+    headers: adminHeaders,
+  })).statusCode, 400);
+  assert.equal((await invoke(api, {
+    method: "GET",
+    query: { route: "admin/gallery-photos", path: "user-supplied-value", eventId: String(eventIds[0]) },
+    headers: adminHeaders,
+  })).statusCode, 400);
+  assert.equal((await invoke(api, {
+    method: "GET",
+    query: { ...rewriteQuery, eventId: "not-an-object-id" },
+    headers: adminHeaders,
+  })).statusCode, 400);
 
   const files = Array.from({ length: 21 }, (_, index) => ({
     clientId: `phase4_${runId}_${index}`,
