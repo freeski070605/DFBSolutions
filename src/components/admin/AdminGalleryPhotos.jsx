@@ -20,6 +20,7 @@ import {
   validateSelectedGalleryFiles,
 } from "../../utils/galleryImageProcessing.js";
 import { uploadToPresignedUrl } from "../../utils/galleryUpload.js";
+import AdminGalleryVideo from "./AdminGalleryVideo.jsx";
 
 const RESERVATION_SIZE = 50;
 const URL_BATCH_SIZE = 6;
@@ -184,9 +185,11 @@ export default function AdminGalleryPhotos({ event, onBack, onEventChanged }) {
   return <div className="admin-gallery-photos">
     <header className="admin-page-header gallery-photo-heading">
       <button className="gallery-back-button" onClick={onBack} disabled={uploading}><ArrowLeft />Event Galleries</button>
-      <div><p className="eyebrow">Photo management</p><h1>{event.title}</h1><p>{event.photoCount} ready {event.photoCount === 1 ? "photo" : "photos"} available to clients.</p></div>
+      <div><p className="eyebrow">Event media management</p><h1>{event.title}</h1><p>Manage the featured film and {event.photoCount} ready {event.photoCount === 1 ? "photo" : "photos"} available to clients.</p></div>
     </header>
     {(error || notice) && <p className={`admin-message ${error ? "is-error" : ""}`} role={error ? "alert" : "status"}>{error || notice}</p>}
+
+    <AdminGalleryVideo event={event} onEventChanged={onEventChanged} />
 
     <section className="gallery-upload-panel">
       <div className="gallery-photo-section-title"><div><p className="eyebrow">Direct to private storage</p><h2>Upload Photos</h2></div><span>JPEG / PNG / WebP · 100 MB max each</span></div>

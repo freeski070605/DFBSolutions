@@ -3,7 +3,8 @@ import {
   Maximize2, RefreshCw, X,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { GalleryApiError, listGalleryPhotos, requestGalleryPhotoDownload } from "../../utils/galleryApi.js";
+import { GalleryApiError, getGalleryVideo, listGalleryPhotos, requestGalleryPhotoDownload } from "../../utils/galleryApi.js";
+import EventFilm from "./EventFilm.jsx";
 
 export default function EventGallery({ event, onLogout, leaving, onAccessLost }) {
   const [photos, setPhotos] = useState([]);
@@ -15,6 +16,8 @@ export default function EventGallery({ event, onLogout, leaving, onAccessLost })
   const [error, setError] = useState("");
   const [staleUrls, setStaleUrls] = useState(false);
   const [coverUrl, setCoverUrl] = useState(null);
+  const [video, setVideo] = useState(null);
+  const [videoLoading, setVideoLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(null);
   const eventDate = formatEventDate(event.eventDate);
 
@@ -39,6 +42,15 @@ export default function EventGallery({ event, onLogout, leaving, onAccessLost })
   }, [onAccessLost]);
 
   useEffect(() => { loadPage(1); }, [loadPage]);
+  const loadVideo = useCallback(async () => {
+    setVideoLoading(true);
+    try { const data = await getGalleryVideo(); setVideo(data.video || null); }
+    catch (requestError) {
+      if (requestError instanceof GalleryApiError && [401, 403].includes(requestError.status)) onAccessLost?.();
+      else setError("The event film could not be loaded. Photographs remain available below.");
+    } finally { setVideoLoading(false); }
+  }, [onAccessLost]);
+  useEffect(() => { loadVideo(); }, [loadVideo]);
 
   async function refreshLoadedUrls() {
     setLoading(true); setError("");
@@ -76,6 +88,8 @@ export default function EventGallery({ event, onLogout, leaving, onAccessLost })
       {error && <div className="gallery-public-message is-error" role="alert"><p>{error}</p><button onClick={() => loadPage(Math.max(1, page))}><RefreshCw />Try Again</button></div>}
       {staleUrls && <div className="gallery-public-message"><p>Some private image links need to be refreshed.</p><button onClick={refreshLoadedUrls}><RefreshCw />Refresh Images</button></div>}
 
+      {video && <EventFilm video={video} onRefresh={loadVideo} />}
+
       {loading && !photos.length ? <section className="gallery-photo-loading" aria-live="polite"><span className="gallery-loading-mark" />Preparing your photographs…</section> : photos.length ? <section className="gallery-client-library" aria-label={`${event.title} photographs`}>
         <div className="gallery-client-intro"><p className="eyebrow">Event photographs</p><span>{photos.length} of {total || photos.length} loaded</span></div>
         <div className="gallery-photo-columns">{photos.map((photo, index) => <button key={photo.id} className="gallery-photo-tile" onClick={() => setActiveIndex(index)} aria-label={`Open photograph ${index + 1} of ${total || photos.length}`}>
@@ -83,7 +97,7 @@ export default function EventGallery({ event, onLogout, leaving, onAccessLost })
           <span><Maximize2 aria-hidden="true" />View</span>
         </button>)}</div>
         {page < pages && <button className="btn btn-secondary gallery-public-load-more" onClick={() => loadPage(page + 1, { append: true })} disabled={loadingMore}>{loadingMore ? "Loading…" : "Load More Photographs"}</button>}
-      </section> : !loading && !error ? <section className="gallery-empty-state" aria-label="Gallery delivery status">
+      </section> : !loading && !videoLoading && !video && !error ? <section className="gallery-empty-state" aria-label="Gallery delivery status">
         <span><ImageIcon aria-hidden="true" /></span>
         <p className="eyebrow">Private photo delivery</p>
         <h2>Your gallery is being prepared.</h2>

@@ -10,7 +10,8 @@
     "validate:gallery": "node scripts/validate-gallery-foundation.js",
     "validate:gallery:phase2": "node scripts/validate-gallery-phase2.js",
     "validate:gallery:phase3": "node scripts/validate-gallery-phase3.js",
-    "validate:gallery:phase4": "node scripts/validate-gallery-phase4.js"
+    "validate:gallery:phase4": "node scripts/validate-gallery-phase4.js",
+    "validate:gallery:video": "node scripts/validate-gallery-video.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1118.0",

@@ -74,12 +74,41 @@ export function deleteAdminGalleryPhoto(eventId, photoId) {
   return request(`/api/admin/gallery-photos?${params}`, { method: "DELETE" });
 }
 
+export function getAdminGalleryVideo(eventId) {
+  return request(`/api/admin/gallery-video?eventId=${encodeURIComponent(eventId)}`);
+}
+
+export function reserveAdminGalleryVideo(payload) {
+  return request("/api/admin/gallery-video?action=reserve", { method: "POST", body: JSON.stringify(payload) });
+}
+
+export function getAdminGalleryVideoUploadUrl(eventId, videoId) {
+  return request("/api/admin/gallery-video?action=upload-url", { method: "POST", body: JSON.stringify({ eventId, videoId }) });
+}
+
+export function completeAdminGalleryVideo(payload) {
+  return request("/api/admin/gallery-video?action=complete", { method: "POST", body: JSON.stringify(payload) });
+}
+
+export function markAdminGalleryVideoFailed(eventId, videoId, message) {
+  return request("/api/admin/gallery-video?action=mark-failed", { method: "POST", body: JSON.stringify({ eventId, videoId, message }) });
+}
+
+export function deleteAdminGalleryVideo(eventId, videoId) {
+  const params = new URLSearchParams({ eventId, videoId });
+  return request(`/api/admin/gallery-video?${params}`, { method: "DELETE" });
+}
+
 export function listGalleryPhotos({ page = 1, limit = 40 } = {}) {
   return request(`/api/gallery/photos?page=${page}&limit=${limit}`);
 }
 
 export function requestGalleryPhotoDownload(photoId) {
   return request("/api/gallery/download", { method: "POST", body: JSON.stringify({ photoId }) });
+}
+
+export function getGalleryVideo() {
+  return request("/api/gallery/video");
 }
 
 async function request(url, options = {}, { allowUnauthorized = false } = {}) {

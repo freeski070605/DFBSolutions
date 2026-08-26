@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+  <title id="title">DFB Solutions event film</title>
+  <desc id="description">Dark branded background for a private event film.</desc>
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="44%" r="65%">
+      <stop offset="0" stop-color="#252a20"/>
+      <stop offset="1" stop-color="#090a08"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#glow)"/>
+  <path d="M120 110h1360M120 790h1360" stroke="#cfff45" stroke-opacity=".28"/>
+  <text x="800" y="425" fill="#f4f4ef" font-family="Arial,Helvetica,sans-serif" font-size="104" font-weight="700" text-anchor="middle" letter-spacing="20">DFB</text>
+  <text x="800" y="500" fill="#cfff45" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="700" text-anchor="middle" letter-spacing="14">SOLUTIONS</text>
+  <text x="800" y="610" fill="#8d9186" font-family="Arial,Helvetica,sans-serif" font-size="20" text-anchor="middle" letter-spacing="7">PRIVATE EVENT FILM</text>
+</svg>

@@ -54,6 +54,12 @@ export function createGalleryObjectKeys(eventId, photoId, originalExtension) {
   });
 }
 
+export function createGalleryVideoObjectKey(eventId, videoId) {
+  const safeEventId = normalizeInternalId(eventId, "eventId");
+  const safeVideoId = normalizeInternalId(videoId, "videoId");
+  return `events/${safeEventId}/video/${safeVideoId}.mp4`;
+}
+
 export function normalizeOriginalExtension(value) {
   if (typeof value !== "string") throw new TypeError("Original extension must be a string.");
   const extension = value.trim().toLowerCase().replace(/^\./, "");
