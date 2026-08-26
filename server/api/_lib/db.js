@@ -41,6 +41,7 @@ export const DATABASE_INDEXES = Object.freeze([
   ["gallery_events", { published: 1, archivedAt: 1, expiresAt: 1 }],
   ["gallery_photos", { eventId: 1, status: 1, sortOrder: 1 }],
   ["gallery_photos", { eventId: 1, _id: 1 }],
+  ["gallery_photos", { eventId: 1, clientUploadId: 1 }, { unique: true, sparse: true }],
   ["gallery_code_attempts", { identifierHash: 1 }, { unique: true }],
   ["gallery_code_attempts", { expiresAt: 1 }, { expireAfterSeconds: 0 }],
 ]);

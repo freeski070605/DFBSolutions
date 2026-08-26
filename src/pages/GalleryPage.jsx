@@ -61,7 +61,7 @@ export default function GalleryPage() {
       {checking ? (
         <main className="gallery-checking" aria-live="polite"><span className="gallery-loading-mark" aria-hidden="true" />Checking private gallery access…</main>
       ) : event ? (
-        <EventGallery event={event} onLogout={leaveGallery} leaving={leaving} />
+        <EventGallery event={event} onLogout={leaveGallery} leaving={leaving} onAccessLost={() => setEvent(null)} />
       ) : (
         <main className="gallery-entry-shell">
           <section className="gallery-entry-intro">

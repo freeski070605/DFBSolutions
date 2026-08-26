@@ -39,6 +39,49 @@ export function runAdminGalleryAction(id, action) {
   return request(`/api/admin/galleries?id=${encodeURIComponent(id)}&action=${encodeURIComponent(action)}`, { method: "POST", body: JSON.stringify({}) });
 }
 
+export function listAdminGalleryPhotos(eventId, { page = 1, limit = 40, status = "" } = {}) {
+  const params = new URLSearchParams({ eventId, page: String(page), limit: String(limit) });
+  if (status) params.set("status", status);
+  return request(`/api/admin/gallery-photos?${params}`);
+}
+
+export function reserveAdminGalleryPhotos(eventId, files) {
+  return request("/api/admin/gallery-photos", { method: "POST", body: JSON.stringify({ eventId, files }) });
+}
+
+export function getAdminGalleryUploadUrls(eventId, photoIds) {
+  return request("/api/admin/gallery-upload-urls", { method: "POST", body: JSON.stringify({ eventId, photoIds }) });
+}
+
+export function completeAdminGalleryUpload(payload) {
+  return request("/api/admin/gallery-upload-complete", { method: "POST", body: JSON.stringify(payload) });
+}
+
+export function markAdminGalleryUploadFailed(eventId, photoId, message) {
+  return request("/api/admin/gallery-photos?action=mark-failed", { method: "POST", body: JSON.stringify({ eventId, photoId, message }) });
+}
+
+export function setAdminGalleryCover(eventId, photoId) {
+  return request("/api/admin/gallery-photos?action=set-cover", { method: "POST", body: JSON.stringify({ eventId, photoId }) });
+}
+
+export function reorderAdminGalleryPhotos(eventId, photos) {
+  return request("/api/admin/gallery-photos", { method: "PUT", body: JSON.stringify({ eventId, photos }) });
+}
+
+export function deleteAdminGalleryPhoto(eventId, photoId) {
+  const params = new URLSearchParams({ eventId, photoId });
+  return request(`/api/admin/gallery-photos?${params}`, { method: "DELETE" });
+}
+
+export function listGalleryPhotos({ page = 1, limit = 40 } = {}) {
+  return request(`/api/gallery/photos?page=${page}&limit=${limit}`);
+}
+
+export function requestGalleryPhotoDownload(photoId) {
+  return request("/api/gallery/download", { method: "POST", body: JSON.stringify({ photoId }) });
+}
+
 async function request(url, options = {}, { allowUnauthorized = false } = {}) {
   const response = await fetch(url, {
     credentials: "same-origin",

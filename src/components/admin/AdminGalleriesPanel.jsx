@@ -1,5 +1,5 @@
 import {
-  Archive, Check, Clipboard, Edit3, Eye, EyeOff, GalleryVerticalEnd,
+  Archive, Check, Clipboard, Edit3, Eye, EyeOff, GalleryVerticalEnd, Images,
   KeyRound, Plus, RefreshCw, RotateCcw, X,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -10,6 +10,7 @@ import {
   runAdminGalleryAction,
   updateAdminGallery,
 } from "../../utils/galleryApi.js";
+import AdminGalleryPhotos from "./AdminGalleryPhotos.jsx";
 
 export default function AdminGalleriesPanel() {
   const [events, setEvents] = useState([]);
@@ -21,6 +22,7 @@ export default function AdminGalleriesPanel() {
   const [confirming, setConfirming] = useState(null);
   const [codeReveal, setCodeReveal] = useState(null);
   const [acting, setActing] = useState(false);
+  const [managing, setManaging] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -28,6 +30,7 @@ export default function AdminGalleriesPanel() {
     try {
       const data = await listAdminGalleries();
       setEvents(data.items || []);
+      setManaging((current) => current ? data.items?.find((event) => event.id === current.id) || current : null);
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -71,6 +74,10 @@ export default function AdminGalleriesPanel() {
     }
   }
 
+  if (managing) {
+    return <AdminGalleryPhotos event={managing} onBack={() => setManaging(null)} onEventChanged={load} />;
+  }
+
   return (
     <div className="admin-galleries">
       <header className="admin-page-header gallery-admin-heading">
@@ -108,6 +115,7 @@ export default function AdminGalleriesPanel() {
                 </dl>
               </div>
               <div className="gallery-admin-actions">
+                <button onClick={() => setManaging(event)}><Images />Manage Photos</button>
                 <button onClick={() => setEditor({ event })}><Edit3 />Edit</button>
                 <button onClick={() => setResetting(event)}><KeyRound />Reset Code</button>
                 {!event.archivedAt && <button onClick={() => setConfirming(publishConfirmation(event))}>{event.published ? <EyeOff /> : <Eye />}{event.published ? "Unpublish" : "Publish"}</button>}

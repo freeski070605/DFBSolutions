@@ -7,6 +7,8 @@ export const GALLERY_EVENT_DEFAULTS = Object.freeze({
   downloadsEnabled: true,
   coverPhotoId: null,
   photoCount: 0,
+  nextPhotoSortOrder: 0,
+  readyPhotoIds: [],
   archivedAt: null,
 });
 
