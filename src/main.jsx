@@ -5,14 +5,13 @@ import App from "./App.jsx";
 import "./index.css";
 import { ProjectsProvider } from "./context/ProjectsContext.jsx";
 import { DivisionsProvider } from "./context/DivisionsContext.jsx";
+import { ContentProvider } from "./context/ContentContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <ProjectsProvider>
-        <DivisionsProvider>
-          <App />
-        </DivisionsProvider>
+        <DivisionsProvider><ContentProvider><App /></ContentProvider></DivisionsProvider>
       </ProjectsProvider>
     </BrowserRouter>
   </React.StrictMode>

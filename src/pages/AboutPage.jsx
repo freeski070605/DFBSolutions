@@ -1,26 +1,30 @@
 import { ArrowRight, Camera, Code2, Hammer, Route } from "lucide-react";
 import { Link } from "react-router-dom";
 import Seo from "../components/Seo.jsx";
+import { useContent } from "../context/ContentContext.jsx";
 
 export default function AboutPage() {
+  const { siteContent } = useContent();
+  const about = siteContent.about;
   return (
     <main id="top">
-      <Seo title="About" description="DFB Solutions was built around a simple belief: understand the real need first, then choose or build the right solution." />
+      <Seo title="About" description={about.intro} image={about.heroMedia?.src} />
       <section className="page-hero about-hero section">
-        <div><p className="eyebrow">Why DFB exists</p><h1>One mission.<br /><em>Whatever the tool.</em></h1></div>
-        <p>DFB was built around the belief that people should not need five disconnected companies to move one idea or problem forward.</p>
+        <div><p className="eyebrow">Why DFB exists</p><h1>{about.headline}</h1></div>
+        <p>{about.intro}</p>
       </section>
+      {about.heroMedia?.src && <section className="section about-media"><img src={about.heroMedia.src} alt={about.heroMedia.alt || "DFB Solutions"} /></section>}
       <section className="section about-story">
         <p className="section-number">01 / The belief</p>
         <div>
-          <h2>Understand the real need first.</h2>
-          <p>A request often arrives as a service: “I need a website,” “I need a video,” or “I need a ride.” But the useful work begins one level deeper. Who is this for? What is getting in the way? What does a successful outcome actually need to do?</p>
-          <p>DFB approaches each project by answering those questions, then selecting or building the right solution. That may mean a digital product, creative production, property work, or transportation logistics. The range is intentional because real problems do not always fit inside a single category.</p>
+          <h2>Creative work and digital products belong in the same conversation.</h2>
+          <p>{about.story}</p>
+          <p>Photography, film, brand content, and digital products are the center of DFB. Transportation and Property remain practical additional solutions under the same promise: Every Problem Has a Solution.</p>
         </div>
       </section>
       <section className="section mission-panel">
         <div className="mission-tools" aria-hidden="true"><Code2 /><Camera /><Hammer /><Route /></div>
-        <blockquote>“The tool changes.<br /><em>The mission does not.</em>”</blockquote>
+        <blockquote>“{about.mission}”</blockquote>
         <p>Professional work starts with a clear problem, a thoughtful plan, and ownership of the result.</p>
       </section>
       <section className="section values-section">

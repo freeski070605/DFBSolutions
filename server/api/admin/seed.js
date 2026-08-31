@@ -3,6 +3,7 @@ import { getDb } from "../_lib/db.js";
 import { json } from "../_lib/http.js";
 import { projects } from "../../../src/data/projects.js";
 import { divisions } from "../../../src/data/divisions.js";
+import { servicePages } from "../../../src/data/servicePages.js";
 
 export default async function handler(req, res) {
   const admin = await requireAdmin(req, res);
@@ -28,5 +29,14 @@ export default async function handler(req, res) {
     );
     if (result.upsertedCount) divisionsAdded += 1;
   }
-  return json(res, 200, { success: true, message: `${added} projects and ${divisionsAdded} divisions imported. Existing records were preserved.` });
+  let servicesAdded = 0;
+  for (const service of servicePages) {
+    const result = await db.collection("services").updateOne(
+      { slug: service.slug },
+      { $setOnInsert: { ...service, createdAt: new Date(), updatedAt: new Date(), createdBy: admin.email } },
+      { upsert: true },
+    );
+    if (result.upsertedCount) servicesAdded += 1;
+  }
+  return json(res, 200, { success: true, message: added + " projects, " + divisionsAdded + " legacy divisions, and " + servicesAdded + " services imported. Existing records were preserved." });
 }

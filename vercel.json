@@ -29,6 +29,10 @@
       "destination": "/api/index?route=contact"
     },
     {
+      "source": "/api/contact-uploads",
+      "destination": "/api/index?route=contact-uploads"
+    },
+    {
       "source": "/api/join-free-list",
       "destination": "/api/index?route=join-free-list"
     },

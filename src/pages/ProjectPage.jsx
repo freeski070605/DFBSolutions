@@ -14,12 +14,12 @@ export default function ProjectPage() {
   const related = projects.filter((item) => item.division === project.division && item.slug !== project.slug).slice(0, 2);
   return (
     <main id="top" style={{ "--page-accent": project.accent }}>
-      <Seo title={project.title} description={project.summary} />
+      <Seo title={project.seoTitle || project.title} description={project.seoDescription || project.summary} image={project.coverImage} />
       <section className="project-hero section">
         <Link className="back-link" to="/work"><ArrowLeft size={15} /> All work</Link>
         <div className="project-title"><p className="eyebrow">{divisionLabels[project.division]} / {project.category}</p><h1>{project.title}</h1><p>{project.summary}</p></div>
         <div className={`project-stage ${project.coverImage ? "has-image" : ""}`}>
-          {project.coverImage ? <img src={project.coverImage} alt={`${project.title} project cover`} /> : <><span>DFB / {divisionLabels[project.division]}</span><strong>{project.title.slice(0, 2).toUpperCase()}</strong><i /></>}
+          {project.coverImage ? <img src={project.coverImage} alt={project.coverImageAlt || `${project.title} project cover`} /> : <><span>DFB / {divisionLabels[project.division]}</span><strong>{project.title.slice(0, 2).toUpperCase()}</strong><i /></>}
         </div>
       </section>
       <section className="section case-overview">
@@ -38,11 +38,20 @@ export default function ProjectPage() {
       </section>}
       {project.websiteUrl && <section className="section website-link-panel"><div><p className="eyebrow">Live project</p><h2>Visit {project.title}.</h2></div><a className="btn btn-primary" href={project.websiteUrl} target="_blank" rel="noreferrer">{project.websiteLabel || "Visit website"} <ArrowRight size={17} /></a></section>}
       {related.length > 0 && <section className="section related-work"><div className="section-heading"><div><p className="eyebrow">Related work</p><h2>More from {divisionLabels[project.division]}.</h2></div></div><div className="project-grid">{related.map((item, index) => <ProjectCard key={item.slug} project={item} index={index} />)}</div></section>}
-      <section className="section mini-cta"><div><p className="eyebrow">Have a related problem?</p><h2>Let’s figure out the right way to solve it.</h2></div><Link className="btn btn-primary" to={`/contact?type=${project.division}`}>Start a conversation <ArrowRight size={17} /></Link></section>
+      <section className="section mini-cta"><div><p className="eyebrow">Want something related?</p><h2>Start with a request matched to this work.</h2></div><Link className="btn btn-primary" to={projectContact(project)}>Book / Get a Quote <ArrowRight size={17} /></Link></section>
     </main>
   );
 }
 
+function projectContact(project) {
+  if (project.serviceSlug) {
+    const mapping = { photography: "photography", videography: "videography", weddings: "photo-video", events: "photography", "sports-media": "photo-video", "music-videos": "videography", "brand-content": "content", websites: "website", apps: "app", branding: "branding" };
+    return "/contact?service=" + (mapping[project.serviceSlug] || project.serviceSlug) + (project.serviceSlug === "weddings" ? "&subtype=wedding" : project.serviceSlug === "music-videos" ? "&subtype=music-video" : "");
+  }
+  const bySlug = { "wedding-coverage": "photo-video&subtype=wedding", "prom-coverage": "photography&subtype=prom", "sports-video": "videography&subtype=sports-highlight", "music-video": "videography&subtype=music-video", "divine-design-decor": "website", reemteam: "app", "mah-booking": "app", tasktracer: "app", "love-is-rage": "app" };
+  if (bySlug[project.slug]) return "/contact?service=" + bySlug[project.slug];
+  return "/contact?type=" + project.division;
+}
 function VideoEmbed({ url, title }) {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([^?&/]+)/);
   if (match) return <div className="video-frame"><iframe src={`https://www.youtube.com/embed/${match[1]}`} title={title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /></div>;

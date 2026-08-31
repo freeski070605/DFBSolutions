@@ -13,6 +13,7 @@ import NotFoundPage from "./pages/NotFoundPage.jsx";
 import ProjectPage from "./pages/ProjectPage.jsx";
 import SoundPage from "./pages/SoundPage.jsx";
 import WorkPage from "./pages/WorkPage.jsx";
+import ServicePage from "./pages/ServicePage.jsx";
 
 export default function App() {
   const location = useLocation();
@@ -38,6 +39,17 @@ export default function App() {
           <Route path="/admin/*" element={<AdminPage />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/solutions/:slug" element={<DivisionPage />} />
+          <Route path="/services/:slug" element={<ServicePage />} />
+          <Route path="/photography" element={<ServicePage slug="photography" />} />
+          <Route path="/videography" element={<ServicePage slug="videography" />} />
+          <Route path="/weddings" element={<ServicePage slug="weddings" />} />
+          <Route path="/events" element={<ServicePage slug="events" />} />
+          <Route path="/sports-media" element={<ServicePage slug="sports-media" />} />
+          <Route path="/music-videos" element={<ServicePage slug="music-videos" />} />
+          <Route path="/brand-content" element={<ServicePage slug="brand-content" />} />
+          <Route path="/websites" element={<ServicePage slug="websites" />} />
+          <Route path="/apps" element={<ServicePage slug="apps" />} />
+          <Route path="/branding" element={<ServicePage slug="branding" />} />
           <Route path="/work" element={<WorkPage />} />
           <Route path="/work/:slug" element={<ProjectPage />} />
           <Route path="/about" element={<AboutPage />} />

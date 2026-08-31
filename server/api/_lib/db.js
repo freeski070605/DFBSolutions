@@ -33,6 +33,10 @@ let indexesReady = false;
 export const DATABASE_INDEXES = Object.freeze([
   ["admins", { email: 1 }, { unique: true }],
   ["projects", { slug: 1 }, { unique: true }],
+  ["services", { slug: 1 }, { unique: true }],
+  ["services", { active: 1, sortOrder: 1 }],
+  ["testimonials", { public: 1, sortOrder: 1 }],
+  ["site_content", { key: 1 }, { unique: true }],
   ["inquiries", { createdAt: -1 }],
   ["customers", { email: 1 }, { sparse: true }],
   ["bookings", { startAt: 1 }],

@@ -31,7 +31,7 @@ export async function handleResource(req, res, config) {
     const input = buildDocument(parseBody(req), config);
     const document = { ...config.defaults, ...input, createdAt: now, updatedAt: now, createdBy: admin.email };
     if (config.validate) {
-      const error = config.validate(document);
+      const error = await config.validate(document, { collection, id: null });
       if (error) return json(res, 400, { success: false, message: error });
     }
     const result = await collection.insertOne(document);
@@ -46,7 +46,7 @@ export async function handleResource(req, res, config) {
     const document = { ...input, updatedAt: now, updatedBy: admin.email };
     if (config.validate) {
       const existing = await collection.findOne({ _id: new ObjectId(id) });
-      const error = config.validate({ ...existing, ...document });
+      const error = await config.validate({ ...existing, ...document }, { collection, id: new ObjectId(id) });
       if (error) return json(res, 400, { success: false, message: error });
     }
     const updated = await collection.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: document }, { returnDocument: "after" });

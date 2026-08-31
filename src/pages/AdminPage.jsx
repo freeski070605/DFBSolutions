@@ -1,4 +1,4 @@
-import { CalendarDays, FolderKanban, Images, LayoutDashboard, LogOut, Menu, Search, Settings, Users, X } from "lucide-react";
+import { CalendarDays, FolderKanban, Images, LayoutDashboard, LogOut, Menu, MessageSquareQuote, PanelsTopLeft, Search, Settings, Users, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AdminGalleriesPanel from "../components/admin/AdminGalleriesPanel.jsx";
 import Seo from "../components/Seo.jsx";
@@ -19,11 +19,12 @@ const resources = {
     label: "Inquiries", endpoint: "/api/admin/inquiries", icon: Menu,
     fields: [
       ["name", "Name", "text", true], ["email", "Email", "email", true], ["phone", "Phone"],
-      ["inquiryType", "Division", "select", false, ["digital", "creative", "property", "transportation", "unsure"]],
+      ["serviceCategory", "Service", "select", false, ["photography", "videography", "photo-video", "website", "app", "branding", "content", "transportation", "property", "unsure"]],
+      ["serviceType", "Service label"], ["projectSubtype", "Project subtype"], ["eventDate", "Event / shoot date", "date"], ["location", "Location"], ["budget", "Budget"],
       ["status", "Status", "select", true, ["new", "contacted", "qualified", "proposal", "won", "lost", "archived"]],
       ["assignedTo", "Assigned to"], ["notes", "Internal notes", "textarea"],
     ],
-    summary: (item) => item.details?.projectGoal || item.details?.projectKind || item.email,
+    summary: (item) => (item.projectSubtype || item.serviceType || item.inquiryType || "Inquiry") + " · " + (item.details?.projectGoal || item.email),
   },
   customers: {
     label: "Customers", endpoint: "/api/admin/customers", icon: Users,
@@ -51,14 +52,38 @@ const resources = {
     label: "Website Portfolio", endpoint: "/api/admin/projects", icon: FolderKanban,
     fields: [
       ["title", "Project title", "text", true], ["slug", "URL slug", "text", true],
-      ["division", "Division", "select", true, ["digital", "creative", "property", "transportation"]],
-      ["category", "Category"], ["summary", "Short summary", "textarea"], ["problem", "The problem", "textarea"], ["solution", "The solution", "textarea"],
+      ["division", "Legacy division", "select", true, ["digital", "creative", "property", "transportation"]],
+      ["serviceSlug", "Matching service slug"], ["category", "Customer-facing category", "select", false, ["Photography", "Video", "Weddings & Events", "Sports", "Music", "Brands", "Websites", "Apps & Platforms", "Transportation", "Property"]],
+      ["summary", "Short summary", "textarea"], ["problem", "The problem", "textarea"], ["solution", "The solution", "textarea"],
       ["deliverables", "Deliverables — one per line", "lines"], ["features", "Features — one per line", "lines"],
-      ["coverImage", "Cover image URL"], ["videoUrl", "YouTube or video URL"], ["websiteUrl", "Live website URL"], ["websiteLabel", "Website button label"],
+      ["coverImage", "Hero / cover image URL"], ["coverImageAlt", "Cover image alt text"], ["videoUrl", "YouTube or video URL"], ["websiteUrl", "Live website URL"], ["websiteLabel", "Website button label"],
       ["gallery", "Gallery — image URL | alt text, one per line", "gallery"], ["accent", "Accent color", "color"],
-      ["sortOrder", "Sort order", "number"], ["featured", "Featured on homepage", "checkbox"], ["published", "Published", "checkbox"],
+      ["seoTitle", "SEO title"], ["seoDescription", "SEO description", "textarea"], ["sortOrder", "Sort order", "number"], ["featured", "Featured on homepage", "checkbox"], ["published", "Published", "checkbox"], ["archived", "Archived", "checkbox"],
     ],
     summary: (item) => `${item.division || "Unassigned"} · ${item.published ? "Published" : "Draft"}`,
+  },
+  services: {
+    label: "Services", endpoint: "/api/admin/services", icon: PanelsTopLeft,
+    fields: [
+      ["name", "Service name", "text", true], ["slug", "URL slug", "text", true], ["category", "Category", "select", true, ["photo-video", "digital", "more"]],
+      ["eyebrow", "Eyebrow"], ["headline", "Hero headline", "textarea"], ["intro", "Long introduction", "textarea"], ["heroMedia", "Hero media JSON (src, alt, type, poster)", "json"],
+      ["serviceItems", "Service items — one per line", "lines"], ["included", "What is included — one per line", "lines"], ["process", "Process — title | description", "pairs"],
+      ["gallery", "Gallery — image URL | alt text", "gallery"], ["pricing", "Pricing JSON (label, text, visible)", "json"], ["turnaround", "Turnaround guidance", "textarea"],
+      ["faqs", "FAQs — question | answer", "pairs"], ["featuredProjectSlugs", "Featured project slugs — one per line", "lines"],
+      ["ctaLabel", "CTA label"], ["ctaService", "Intake service"], ["ctaSubtype", "Intake subtype"], ["seoTitle", "SEO title"], ["seoDescription", "SEO description", "textarea"], ["seoImage", "Social image URL"],
+      ["accent", "Accent color", "color"], ["sortOrder", "Sort order", "number"], ["primary", "Primary service", "checkbox"], ["active", "Published / active", "checkbox"],
+    ],
+    summary: (item) => item.category + " · " + (item.active ? "Published" : "Draft"),
+  },
+  testimonials: {
+    label: "Testimonials", endpoint: "/api/admin/testimonials", icon: MessageSquareQuote,
+    fields: [["clientName", "Client name", "text", true], ["businessEvent", "Business / event"], ["serviceType", "Service type"], ["serviceSlugs", "Assigned service slugs", "lines"], ["quote", "Testimonial", "textarea", true], ["imageUrl", "Optional headshot / logo URL"], ["imageAlt", "Image alt text"], ["sortOrder", "Sort order", "number"], ["featured", "Featured", "checkbox"], ["public", "Approved and public", "checkbox"]],
+    summary: (item) => (item.serviceType || "Unassigned") + " · " + (item.public ? "Public" : "Private draft"),
+  },
+  siteContent: {
+    label: "Site Content", endpoint: "/api/admin/site-content", icon: Settings,
+    fields: [["home", "Homepage content JSON", "json"], ["about", "About page content JSON", "json"], ["global", "Global content JSON", "json"]],
+    summary: () => "Homepage, About, trust language, CTAs, and editable media",
   },
 };
 
@@ -214,6 +239,7 @@ function RecordEditor({ config, item, onClose, onSaved }) {
       <header><div><p className="eyebrow">{item._id ? "Update record" : "New record"}</p><h2>{item.title || item.name || config.label}</h2></div><button aria-label="Close editor" onClick={onClose}><X /></button></header>
       <form onSubmit={submit}><div className="editor-fields">{config.fields.map((field) => <AdminField key={field[0]} field={field} value={form[field[0]]} onChange={(value) => setForm({ ...form, [field[0]]: value })} />)}</div>
         {item.details && <details className="submitted-details"><summary>Original submitted details</summary><pre>{JSON.stringify(item.details, null, 2)}</pre></details>}
+        {item.attachments?.length > 0 && <div className="admin-attachments"><h3>Private attachments</h3>{item.attachments.map((attachment, index) => <button type="button" key={attachment.key} onClick={() => downloadAttachment(item._id, index)}>{attachment.name} <small>{formatBytes(attachment.size)}</small></button>)}</div>}
         {message && <p className="admin-message" role="alert">{message}</p>}
         <footer><button className="btn btn-secondary" type="button" onClick={onClose}>Cancel</button><button className="btn btn-primary" disabled={saving}>{saving ? "Saving…" : "Save record"}</button></footer>
       </form>
@@ -224,8 +250,8 @@ function RecordEditor({ config, item, onClose, onSaved }) {
 function AdminField({ field, value, onChange }) {
   const [name, label, type = "text", required = false, options = []] = field;
   if (type === "checkbox") return <label className="admin-checkbox"><input type="checkbox" checked={Boolean(value)} onChange={(event) => onChange(event.target.checked)} /><span>{label}</span></label>;
-  return <label className={["textarea", "lines", "gallery", "pairs"].includes(type) ? "wide" : ""}><span>{label}{required && <i>Required</i>}</span>
-    {type === "textarea" || type === "lines" || type === "gallery" || type === "pairs" ? <textarea rows={type === "textarea" ? 5 : 4} value={value || ""} required={required} onChange={(event) => onChange(event.target.value)} /> :
+  return <label className={["textarea", "lines", "gallery", "pairs", "json"].includes(type) ? "wide" : ""}><span>{label}{required && <i>Required</i>}</span>
+    {["textarea", "lines", "gallery", "pairs", "json"].includes(type) ? <textarea rows={type === "textarea" ? 5 : type === "json" ? 10 : 4} value={value || ""} required={required} onChange={(event) => onChange(event.target.value)} /> :
       type === "select" ? <select value={value || ""} required={required} onChange={(event) => onChange(event.target.value)}><option value="">Select one</option>{options.map((option) => <option key={option}>{option}</option>)}</select> :
       <input type={type} value={value ?? ""} required={required} onChange={(event) => onChange(event.target.value)} />}
   </label>;
@@ -244,6 +270,7 @@ function toFormValues(item, fields) {
     else if (type === "pairs") output[name] = Array.isArray(value) ? value.map((entry) => `${entry[0] || ""} | ${entry[1] || ""}`).join("\n") : "";
     else if (type === "datetime-local") output[name] = value ? new Date(value).toISOString().slice(0, 16) : "";
     else if (type === "checkbox") output[name] = Boolean(value);
+    else if (type === "json") output[name] = value && typeof value === "object" ? JSON.stringify(value, null, 2) : value || "";
     else output[name] = value ?? "";
   }
   return output;
@@ -256,6 +283,7 @@ function fromFormValues(form, fields) {
     if (type === "lines") output[name] = String(value || "").split("\n").map((line) => line.trim()).filter(Boolean);
     else if (type === "gallery") output[name] = String(value || "").split("\n").map((line) => { const [src, ...alt] = line.split("|"); return { src: src.trim(), alt: alt.join("|").trim() }; }).filter((entry) => entry.src);
     else if (type === "pairs") output[name] = String(value || "").split("\n").map((line) => { const [first, ...second] = line.split("|"); return [first.trim(), second.join("|").trim()]; }).filter(([first, second]) => first && second);
+    else if (type === "json") { try { output[name] = JSON.parse(value || "{}"); } catch { throw new Error(name + " must contain valid JSON."); } }
     else output[name] = value;
   }
   return output;
@@ -272,3 +300,11 @@ function formatDate(value) {
   if (!value) return "—";
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(value));
 }
+
+async function downloadAttachment(id, index) {
+  try {
+    const data = await api("/api/admin/inquiry-attachment?id=" + encodeURIComponent(id) + "&index=" + index);
+    window.location.assign(data.url);
+  } catch (error) { window.alert(error.message); }
+}
+function formatBytes(value) { return Number(value) >= 1048576 ? (Number(value) / 1048576).toFixed(1) + " MB" : Math.ceil(Number(value) / 1024) + " KB"; }
