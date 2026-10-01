@@ -37,6 +37,8 @@ export const DATABASE_INDEXES = Object.freeze([
   ["services", { active: 1, sortOrder: 1 }],
   ["testimonials", { public: 1, sortOrder: 1 }],
   ["site_content", { key: 1 }, { unique: true }],
+  ["site_content_history", { page: 1, createdAt: -1 }],
+  ["site_media", { status: 1, createdAt: -1 }],
   ["inquiries", { createdAt: -1 }],
   ["customers", { email: 1 }, { sparse: true }],
   ["bookings", { startAt: 1 }],

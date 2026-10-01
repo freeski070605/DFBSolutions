@@ -29,9 +29,11 @@ import sitemap from "../server/api/sitemap.js";
 import servicesAdmin from "../server/api/admin/services.js";
 import testimonialsAdmin from "../server/api/admin/testimonials.js";
 import siteContentAdmin from "../server/api/admin/site-content.js";
+import siteMediaAdmin from "../server/api/admin/site-media.js";
 import servicesPublic from "../server/api/content/services.js";
 import testimonialsPublic from "../server/api/content/testimonials.js";
 import siteContentPublic from "../server/api/content/site-content.js";
+import siteMediaPublic from "../server/api/content/site-media.js";
 import contactUploads from "../server/api/contact-uploads.js";
 import inquiryAttachment from "../server/api/admin/inquiry-attachment.js";
 
@@ -55,6 +57,7 @@ const routes = {
   "admin/services": servicesAdmin,
   "admin/testimonials": testimonialsAdmin,
   "admin/site-content": siteContentAdmin,
+  "admin/site-media": siteMediaAdmin,
   "admin/inquiry-attachment": inquiryAttachment,
   "gallery/access": galleryAccess,
   "gallery/photos": galleryPhotos,
@@ -67,6 +70,7 @@ const routes = {
   "content/services": servicesPublic,
   "content/testimonials": testimonialsPublic,
   "content/site-content": siteContentPublic,
+  "content/site-media": siteMediaPublic,
   contact,
   "contact-uploads": contactUploads,
   "join-free-list": joinFreeList,

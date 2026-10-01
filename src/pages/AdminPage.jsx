@@ -1,6 +1,7 @@
 import { CalendarDays, FolderKanban, Images, LayoutDashboard, LogOut, Menu, MessageSquareQuote, PanelsTopLeft, Search, Settings, Users, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AdminGalleriesPanel from "../components/admin/AdminGalleriesPanel.jsx";
+import SiteContentManager from "../components/admin/SiteContentManager.jsx";
 import Seo from "../components/Seo.jsx";
 
 const resources = {
@@ -91,6 +92,11 @@ export default function AdminPage() {
   const [user, setUser] = useState(null);
   const [checking, setChecking] = useState(true);
   const [active, setActive] = useState("overview");
+  const [siteDirty, setSiteDirty] = useState(false);
+  const navigate = (next) => {
+    if (active === "siteContent" && siteDirty && !window.confirm("You have unsaved changes. Discard changes and leave?")) return;
+    setSiteDirty(false); setActive(next);
+  };
 
   useEffect(() => {
     api("/api/auth/session").then((data) => setUser(data.user)).catch(() => {}).finally(() => setChecking(false));
@@ -110,17 +116,17 @@ export default function AdminPage() {
       <aside className="admin-sidebar">
         <div className="admin-brand"><strong>DFB.</strong><span>Command Center</span></div>
         <nav aria-label="Admin navigation">
-          <button className={active === "overview" ? "active" : ""} onClick={() => setActive("overview")}><LayoutDashboard />Overview</button>
+          <button className={active === "overview" ? "active" : ""} onClick={() => navigate("overview")}><LayoutDashboard />Overview</button>
           {Object.entries(resources).map(([key, config]) => {
             const Icon = config.icon;
-            return <button key={key} className={active === key ? "active" : ""} onClick={() => setActive(key)}><Icon />{config.label}</button>;
+            return <button key={key} className={active === key ? "active" : ""} onClick={() => navigate(key)}><Icon />{config.label}</button>;
           })}
-          <button className={active === "galleries" ? "active" : ""} onClick={() => setActive("galleries")}><Images />Event Galleries</button>
+          <button className={active === "galleries" ? "active" : ""} onClick={() => navigate("galleries")}><Images />Event Galleries</button>
         </nav>
         <div className="admin-user"><span>{user.name}</span><small>{user.email}</small><button onClick={logout}><LogOut size={15} />Sign out</button></div>
       </aside>
       <main className="admin-main">
-        {active === "overview" ? <Overview onNavigate={setActive} /> : active === "galleries" ? <AdminGalleriesPanel /> : <ResourcePanel key={active} resourceKey={active} config={resources[active]} />}
+        {active === "overview" ? <Overview onNavigate={navigate} /> : active === "galleries" ? <AdminGalleriesPanel /> : active === "siteContent" ? <SiteContentManager onDirtyChange={setSiteDirty} onNavigate={navigate} /> : <ResourcePanel key={active} resourceKey={active} config={resources[active]} />}
       </main>
     </div>
   );

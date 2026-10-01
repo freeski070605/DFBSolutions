@@ -13,7 +13,7 @@ export default function AboutPage() {
         <div><p className="eyebrow">Why DFB exists</p><h1>{about.headline}</h1></div>
         <p>{about.intro}</p>
       </section>
-      {about.heroMedia?.src && <section className="section about-media"><img src={about.heroMedia.src} alt={about.heroMedia.alt || "DFB Solutions"} /></section>}
+      {about.heroMedia?.src && <section className="section about-media"><img src={about.heroMedia.src} alt={about.heroMedia.alt || "DFB Solutions"} style={{ objectPosition: `${about.heroMedia.focalPoint?.x ?? 50}% ${about.heroMedia.focalPoint?.y ?? 50}%` }} /></section>}
       <section className="section about-story">
         <p className="section-number">01 / The belief</p>
         <div>
