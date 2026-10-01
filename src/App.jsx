@@ -11,6 +11,7 @@ import GalleryPage from "./pages/GalleryPage.jsx";
 import InfoPage from "./pages/InfoPage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import ProjectPage from "./pages/ProjectPage.jsx";
+import PricingPage from "./pages/PricingPage.jsx";
 import SoundPage from "./pages/SoundPage.jsx";
 import WorkPage from "./pages/WorkPage.jsx";
 import ServicePage from "./pages/ServicePage.jsx";
@@ -54,6 +55,7 @@ export default function App() {
           <Route path="/work/:slug" element={<ProjectPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/privacy" element={<InfoPage kind="privacy" />} />
           <Route path="/terms" element={<InfoPage kind="terms" />} />
