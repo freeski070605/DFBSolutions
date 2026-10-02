@@ -103,6 +103,7 @@ export function sanitizeGalleryPhotoForClient(photo) {
     width: photo.width ?? null,
     height: photo.height ?? null,
     sortOrder: Number(photo.sortOrder) || 0,
+    altText: photo.altText || "",
   };
 }
 

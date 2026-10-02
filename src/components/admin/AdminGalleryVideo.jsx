@@ -112,7 +112,7 @@ export default function AdminGalleryVideo({ event, onEventChanged }) {
   const busy = ["uploading", "verifying", "removing"].includes(status);
   return <section className="gallery-video-admin-panel">
     <div className="gallery-video-admin-heading">
-      <div><p className="eyebrow">Featured event video</p><h2>Give clients the finished film.</h2><p>For reliable playback on phones, tablets and computers, upload an H.264 MP4.</p></div>
+      <div><p className="eyebrow">Event Video</p><h2>Give clients the finished film.</h2><p>For reliable playback on phones, tablets and computers, upload an H.264 MP4. {active ? "Video will be shown as the event's primary media." : "Gallery photos will automatically be displayed as a slideshow."}</p></div>
       {!selected && <label className="btn btn-primary gallery-video-file-button"><Upload />{active ? "Replace Video" : "Upload Event Video"}<input type="file" accept="video/mp4,.mp4" disabled={busy} onChange={(event) => { chooseVideo(event.target.files?.[0]); event.target.value = ""; }} /></label>}
     </div>
     {message && <p className={`gallery-video-message ${status === "failed" ? "is-error" : ""}`} role={status === "failed" ? "alert" : "status"}>{message}</p>}

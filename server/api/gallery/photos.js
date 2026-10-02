@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     res.setHeader("Allow", "GET");
     return json(res, 405, { success: false, message: "Method not allowed." });
   }
-  const allowedQuery = new Set(["page", "limit"]);
+  const allowedQuery = new Set(["page", "limit", "view"]);
   if (Object.keys(req.query || {}).some((key) => !allowedQuery.has(key))) return json(res, 400, { success: false, message: "Unsupported gallery photo query." });
   const event = await requireGalleryEventAccess(req, res, { clearInvalidCookie: true });
   if (!event) return;
@@ -19,6 +19,17 @@ export default async function handler(req, res) {
   const db = await getDb();
   const query = { eventId: event._id, status: "ready" };
   const collection = db.collection("gallery_photos");
+  if (req.query?.view === "slideshow") {
+    const featured = await collection.find({ ...query, featuredInSlideshow: true })
+      .sort({ slideshowOrder: 1, sortOrder: 1, _id: 1 }).limit(30).toArray();
+    const slides = featured.length ? featured : await collection.find(query)
+      .sort({ sortOrder: 1, createdAt: 1, _id: 1 }).limit(24).toArray();
+    const items = await Promise.all(slides.map(async (photo) => ({
+      ...sanitizeGalleryPhotoForClient(photo), ...await createPhotoReadUrls(photo, { includeThumb: false }),
+    })));
+    return json(res, 200, { success: true, items });
+  }
+  if (req.query?.view) return json(res, 400, { success: false, message: "Unsupported gallery photo view." });
   const [photos, total, coverPhoto] = await Promise.all([
     collection.find(query).sort({ sortOrder: 1, createdAt: 1, _id: 1 }).skip((page - 1) * limit).limit(limit).toArray(),
     collection.countDocuments(query),

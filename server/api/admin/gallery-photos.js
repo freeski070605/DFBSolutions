@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   res.setHeader("Cache-Control", "private, no-store");
   const db = await getDb();
   if (req.method === "GET") {
-    if (hasUnsupportedQuery(req, new Set(["eventId", "page", "limit", "status"]))) return json(res, 400, { success: false, message: "Unsupported photo list query." });
+    if (hasUnsupportedQuery(req, new Set(["eventId", "page", "limit", "status", "offset", "view"]))) return json(res, 400, { success: false, message: "Unsupported photo list query." });
     return listPhotos(req, res, db);
   }
   if (req.method === "POST") {
@@ -45,11 +45,23 @@ async function listPhotos(req, res, db) {
   const page = Math.max(1, Number(req.query?.page) || 1);
   const limit = Math.min(60, Math.max(1, Number(req.query?.limit) || 40));
   const status = cleanText(req.query?.status, 20);
+  const offset = req.query?.offset == null ? (page - 1) * limit : Number(req.query.offset);
+  if (!Number.isSafeInteger(offset) || offset < 0) return json(res, 400, { success: false, message: "Invalid photo offset." });
   if (status && !PHOTO_STATUSES.has(status)) return json(res, 400, { success: false, message: "Photo status filter is invalid." });
   const query = { eventId, ...(status ? { status } : {}) };
   const collection = db.collection("gallery_photos");
+  if (req.query?.view === "slideshow") {
+    const featured = await collection.find({ eventId, status: "ready", featuredInSlideshow: true })
+      .sort({ slideshowOrder: 1, sortOrder: 1, _id: 1 }).limit(30).toArray();
+    const items = await Promise.all(featured.map(async (photo) => ({
+      ...sanitizeGalleryPhotoForAdmin(photo, (await createPhotoReadUrls(photo, { includeWeb: false })).thumbUrl),
+      isCover: String(event.coverPhotoId || "") === String(photo._id),
+    })));
+    return json(res, 200, { success: true, items });
+  }
+  if (req.query?.view) return json(res, 400, { success: false, message: "Unsupported photo view." });
   const [photos, total] = await Promise.all([
-    collection.find(query).sort({ sortOrder: 1, createdAt: 1, _id: 1 }).skip((page - 1) * limit).limit(limit).toArray(),
+    collection.find(query).sort({ sortOrder: 1, createdAt: 1, _id: 1 }).skip(offset).limit(limit).toArray(),
     collection.countDocuments(query),
   ]);
   const items = await Promise.all(photos.map(async (photo) => {
@@ -107,13 +119,45 @@ async function reservePhotos(req, res, db, admin) {
 }
 
 async function performAction(req, res, db, admin, action) {
-  if (!new Set(["set-cover", "mark-failed"]).has(action)) return json(res, 400, { success: false, message: "Unsupported photo action." });
+  if (!new Set(["set-cover", "mark-failed", "set-slideshow-feature", "reorder-slideshow", "set-alt-text"]).has(action)) return json(res, 400, { success: false, message: "Unsupported photo action." });
   const body = parseBody(req);
-  const allowed = action === "set-cover" ? new Set(["eventId", "photoId"]) : new Set(["eventId", "photoId", "message"]);
+  if (action === "reorder-slideshow") {
+    if (!validBody(body, new Set(["eventId", "photoIds"])) || !Array.isArray(body.photoIds) || body.photoIds.length > 1000) return json(res, 400, { success: false, message: "Invalid slideshow order." });
+    const eventId = objectId(body.eventId);
+    const photoIds = body.photoIds.map(objectId);
+    if (!eventId || photoIds.some((id) => !id) || new Set(photoIds.map(String)).size !== photoIds.length) return json(res, 400, { success: false, message: "Invalid slideshow photo IDs." });
+    const collection = db.collection("gallery_photos");
+    const count = await collection.countDocuments({ eventId, status: "ready", featuredInSlideshow: true, _id: { $in: photoIds } });
+    if (count !== photoIds.length) return json(res, 409, { success: false, message: "Slideshow photos must be featured and ready." });
+    if (photoIds.length) await collection.bulkWrite(photoIds.map((id, index) => ({ updateOne: { filter: { _id: id, eventId }, update: { $set: { slideshowOrder: index, updatedAt: new Date() } } } })));
+    await recordGalleryPhotoAudit(db, admin, "gallery_slideshow_reordered", eventId);
+    return json(res, 200, { success: true });
+  }
+  const allowed = action === "set-cover" ? new Set(["eventId", "photoId"]) : action === "set-slideshow-feature" ? new Set(["eventId", "photoId", "featured"]) : action === "set-alt-text" ? new Set(["eventId", "photoId", "altText"]) : new Set(["eventId", "photoId", "message"]);
   if (!validBody(body, allowed)) return json(res, 400, { success: false, message: "Submit valid photo action details." });
   const eventId = objectId(body.eventId);
   const photoId = objectId(body.photoId);
   if (!eventId || !photoId) return json(res, 400, { success: false, message: "Valid event and photo IDs are required." });
+  if (action === "set-alt-text") {
+    if (typeof body.altText !== "string" || body.altText.length > 240) return json(res, 400, { success: false, message: "Alt text must be 240 characters or fewer." });
+    const altText = cleanText(body.altText, 240);
+    const updated = await db.collection("gallery_photos").updateOne({ _id: photoId, eventId, status: "ready" }, { $set: { altText, updatedAt: new Date() } });
+    if (!updated.matchedCount) return json(res, 409, { success: false, message: "Only ready photos can be described." });
+    await recordGalleryPhotoAudit(db, admin, "gallery_photo_alt_text_changed", eventId, photoId);
+    return json(res, 200, { success: true, altText });
+  }
+  if (action === "set-slideshow-feature") {
+    if (typeof body.featured !== "boolean") return json(res, 400, { success: false, message: "Featured must be true or false." });
+    const collection = db.collection("gallery_photos");
+    const photo = await collection.findOne({ _id: photoId, eventId, status: "ready" });
+    if (!photo) return json(res, 409, { success: false, message: "Only ready photos can be featured." });
+    if (body.featured && !photo.featuredInSlideshow && await collection.countDocuments({ eventId, status: "ready", featuredInSlideshow: true }) >= 30) return json(res, 409, { success: false, message: "A slideshow can contain up to 30 featured photos." });
+    const last = body.featured ? await collection.findOne({ eventId, featuredInSlideshow: true }, { sort: { slideshowOrder: -1 } }) : null;
+    const slideshowOrder = body.featured ? (photo.featuredInSlideshow ? Number(photo.slideshowOrder) || 0 : (Number(last?.slideshowOrder) || 0) + 1) : 0;
+    await collection.updateOne({ _id: photoId, eventId }, { $set: { featuredInSlideshow: body.featured, slideshowOrder, updatedAt: new Date() } });
+    await recordGalleryPhotoAudit(db, admin, "gallery_slideshow_feature_changed", eventId, photoId);
+    return json(res, 200, { success: true, featuredInSlideshow: body.featured, slideshowOrder });
+  }
   if (action === "set-cover") {
     const photo = await db.collection("gallery_photos").findOne({ _id: photoId, eventId, status: "ready" }, { projection: { _id: 1 } });
     if (!photo) return json(res, 409, { success: false, message: "Only a ready photo from this event can be used as the cover." });

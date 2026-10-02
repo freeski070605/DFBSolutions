@@ -7,11 +7,15 @@ import {
   completeAdminGalleryUpload,
   deleteAdminGalleryPhoto,
   getAdminGalleryUploadUrls,
+  listAdminGallerySlideshow,
   listAdminGalleryPhotos,
   markAdminGalleryUploadFailed,
   reorderAdminGalleryPhotos,
+  reorderAdminGallerySlideshow,
   reserveAdminGalleryPhotos,
+  setAdminGalleryAltText,
   setAdminGalleryCover,
+  setAdminGallerySlideshowFeature,
 } from "../../utils/galleryApi.js";
 import {
   formatFileSize,
@@ -27,8 +31,9 @@ const URL_BATCH_SIZE = 6;
 
 export default function AdminGalleryPhotos({ event, onBack, onEventChanged }) {
   const [photos, setPhotos] = useState([]);
+  const [featuredPhotos, setFeaturedPhotos] = useState([]);
   const [page, setPage] = useState(1);
-  const [pages, setPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
@@ -43,15 +48,15 @@ export default function AdminGalleryPhotos({ event, onBack, onEventChanged }) {
   const progressPatches = useRef(new Map());
   const progressFrame = useRef(null);
 
-  const load = useCallback(async ({ append = false, targetPage = 1 } = {}) => {
+  const load = useCallback(async ({ append = false, targetPage = 1, offset } = {}) => {
     append ? setLoadingMore(true) : setLoading(true);
     setError("");
     try {
-      const data = await listAdminGalleryPhotos(event.id, { page: targetPage, limit: 60 });
+      const data = await listAdminGalleryPhotos(event.id, { page: targetPage, limit: 60, offset });
       setPhotos((current) => append ? [...current, ...(data.items || [])] : data.items || []);
       setPage(data.page || targetPage);
-      setPages(data.pages || 1);
-      setOrderDirty(false);
+      setTotal(Number(data.total) || 0);
+      if (!append) setOrderDirty(false);
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -61,6 +66,7 @@ export default function AdminGalleryPhotos({ event, onBack, onEventChanged }) {
   }, [event.id]);
 
   useEffect(() => { load(); }, [load]);
+  useEffect(() => { listAdminGallerySlideshow(event.id).then((data) => setFeaturedPhotos(data.items || [])).catch((requestError) => setError(requestError.message)); }, [event.id]);
   useEffect(() => () => {
     if (progressFrame.current) cancelAnimationFrame(progressFrame.current);
   }, []);
@@ -151,7 +157,7 @@ export default function AdminGalleryPhotos({ event, onBack, onEventChanged }) {
     setSavingOrder(true); setError("");
     try {
       await reorderAdminGalleryPhotos(event.id, readyPhotos.map((photo, index) => ({ photoId: photo.id, sortOrder: index })));
-      setNotice("Photo order saved."); setOrderDirty(false); await load();
+      setNotice("Photo order saved."); setOrderDirty(false);
     } catch (requestError) { setError(requestError.message); }
     finally { setSavingOrder(false); }
   }
@@ -169,17 +175,52 @@ export default function AdminGalleryPhotos({ event, onBack, onEventChanged }) {
   async function removePhoto() {
     const photo = confirmDelete;
     if (!photo) return;
+    const originalIndex = photos.findIndex((item) => item.id === photo.id);
     setConfirmDelete({ ...photo, deleting: true }); setError("");
+    setPhotos((current) => current.filter((item) => item.id !== photo.id));
+    setFeaturedPhotos((current) => current.filter((item) => item.id !== photo.id));
+    setTotal((current) => Math.max(0, current - 1));
     try {
       await deleteAdminGalleryPhoto(event.id, photo.id);
       setConfirmDelete(null);
       setNotice("Photo removed from the gallery and private storage.");
-      await load();
       await onEventChanged?.();
     } catch (requestError) {
       setConfirmDelete(null); setError(requestError.message);
-      await load();
+      setPhotos((current) => { const restored = [...current]; restored.splice(Math.min(originalIndex, restored.length), 0, photo); return restored; });
+      if (photo.featuredInSlideshow) setFeaturedPhotos((current) => [...current, photo].sort((a, b) => a.slideshowOrder - b.slideshowOrder));
+      setTotal((current) => current + 1);
     }
+  }
+
+  async function toggleFeatured(photo) {
+    const featured = !photo.featuredInSlideshow;
+    const slideshowOrder = featured ? Math.max(0, ...featuredPhotos.map((item) => item.slideshowOrder || 0)) + 1 : 0;
+    setPhotos((current) => current.map((item) => item.id === photo.id ? { ...item, featuredInSlideshow: featured, slideshowOrder } : item));
+    setFeaturedPhotos((current) => featured ? [...current, { ...photo, featuredInSlideshow: true, slideshowOrder }] : current.filter((item) => item.id !== photo.id));
+    try {
+      const result = await setAdminGallerySlideshowFeature(event.id, photo.id, featured);
+      setPhotos((current) => current.map((item) => item.id === photo.id ? { ...item, slideshowOrder: result.slideshowOrder } : item));
+      setFeaturedPhotos((current) => current.map((item) => item.id === photo.id ? { ...item, slideshowOrder: result.slideshowOrder } : item).sort((a, b) => a.slideshowOrder - b.slideshowOrder));
+    } catch (requestError) {
+      setPhotos((current) => current.map((item) => item.id === photo.id ? photo : item));
+      setFeaturedPhotos((current) => photo.featuredInSlideshow ? [...current.filter((item) => item.id !== photo.id), photo].sort((a, b) => a.slideshowOrder - b.slideshowOrder) : current.filter((item) => item.id !== photo.id));
+      setError(requestError.message);
+    }
+  }
+
+  async function moveFeatured(photoId, direction) {
+    const ordered = [...featuredPhotos];
+    const index = ordered.findIndex((item) => item.id === photoId);
+    const target = index + direction;
+    if (target < 0 || target >= ordered.length) return;
+    [ordered[index], ordered[target]] = [ordered[target], ordered[index]];
+    const previous = featuredPhotos;
+    const order = new Map(ordered.map((item, position) => [item.id, position]));
+    setFeaturedPhotos(ordered.map((item, position) => ({ ...item, slideshowOrder: position })));
+    setPhotos((current) => current.map((item) => order.has(item.id) ? { ...item, slideshowOrder: order.get(item.id) } : item));
+    try { await reorderAdminGallerySlideshow(event.id, ordered.map((item) => item.id)); }
+    catch (requestError) { setFeaturedPhotos(previous); setPhotos((current) => current.map((item) => { const original = previous.find((photo) => photo.id === item.id); return original ? { ...item, slideshowOrder: original.slideshowOrder } : item; })); setError(requestError.message); }
   }
 
   return <div className="admin-gallery-photos">
@@ -220,18 +261,36 @@ export default function AdminGalleryPhotos({ event, onBack, onEventChanged }) {
 
     <section className="gallery-photo-library">
       <div className="gallery-photo-section-title"><div><p className="eyebrow">Private event library</p><h2>Gallery Photos</h2></div><div>{orderDirty && <button className="btn btn-primary" onClick={saveOrder} disabled={savingOrder}>{savingOrder ? "Saving…" : "Save Order"}</button>}<button className="gallery-icon-button" aria-label="Refresh photo list" onClick={() => load()} disabled={loading}><RefreshCw /></button></div></div>
+      <div className="gallery-slideshow-preview"><strong>Featured in Slideshow</strong><p>{featuredPhotos.length ? "Featured photos appear in this order when no event video is published." : "No featured photos selected. The slideshow automatically uses the first 24 gallery photos when no video is published."}</p>{featuredPhotos.length > 0 && <ol>{featuredPhotos.map((photo, index) => <li key={photo.id}><img src={photo.thumbUrl} alt="" /><span>{photo.originalFilename}</span><button aria-label={`Move ${photo.originalFilename} earlier in slideshow`} disabled={index === 0} onClick={() => moveFeatured(photo.id, -1)}><ArrowUp /></button><button aria-label={`Move ${photo.originalFilename} later in slideshow`} disabled={index === featuredPhotos.length - 1} onClick={() => moveFeatured(photo.id, 1)}><ArrowDown /></button></li>)}</ol>}</div>
       {loading ? <div className="gallery-admin-loading"><RefreshCw />Loading photos…</div> : photos.length === 0 ? <div className="admin-empty gallery-photo-empty"><ImageIcon /><h3>No uploaded photos yet.</h3><p>Choose photographs above to begin this private event gallery.</p></div> : <>
         {incompletePhotos.length > 0 && <div className="gallery-incomplete-list"><h3>Incomplete uploads</h3>{incompletePhotos.map((photo) => <article key={photo.id}><span className={`gallery-status-badge is-${photo.status}`}>{photo.status}</span><strong>{photo.originalFilename}</strong><small>Upload again from the active queue, or remove this abandoned reservation.</small><button onClick={() => setConfirmDelete(photo)}><Trash2 />Remove</button></article>)}</div>}
         {readyPhotos.length > 0 && <div className="gallery-admin-photo-grid">{readyPhotos.map((photo, index) => <article key={photo.id} className={photo.isCover ? "is-cover" : ""}>
           <div className="gallery-admin-photo-image"><img src={photo.thumbUrl} alt="" loading="lazy" />{photo.isCover && <span><Crown />Cover</span>}</div>
           <div className="gallery-admin-photo-meta"><strong>{photo.originalFilename}</strong><small>{photo.width} × {photo.height} · {formatFileSize(photo.originalBytes)}</small></div>
-          <div className="gallery-admin-photo-actions"><button aria-label={`Move ${photo.originalFilename} earlier`} onClick={() => movePhoto(photo.id, -1)} disabled={index === 0}><ArrowUp /></button><button aria-label={`Move ${photo.originalFilename} later`} onClick={() => movePhoto(photo.id, 1)} disabled={index === readyPhotos.length - 1}><ArrowDown /></button><button onClick={() => setCover(photo)} disabled={photo.isCover}><Crown />{photo.isCover ? "Cover" : "Set Cover"}</button><button className="danger" onClick={() => setConfirmDelete(photo)}><Trash2 />Delete</button></div>
+          <PhotoAltText photo={photo} eventId={event.id} onSaved={(altText) => { setPhotos((current) => current.map((item) => item.id === photo.id ? { ...item, altText } : item)); setFeaturedPhotos((current) => current.map((item) => item.id === photo.id ? { ...item, altText } : item)); }} />
+          <div className="gallery-admin-photo-actions"><button aria-label={`Move ${photo.originalFilename} earlier`} onClick={() => movePhoto(photo.id, -1)} disabled={index === 0}><ArrowUp /></button><button aria-label={`Move ${photo.originalFilename} later`} onClick={() => movePhoto(photo.id, 1)} disabled={index === readyPhotos.length - 1}><ArrowDown /></button><button onClick={() => setCover(photo)} disabled={photo.isCover}><Crown />{photo.isCover ? "Cover" : "Set Cover"}</button><button aria-pressed={photo.featuredInSlideshow} onClick={() => toggleFeatured(photo)}>{photo.featuredInSlideshow ? "Featured" : "Feature"}</button><button className="danger" onClick={() => setConfirmDelete(photo)}><Trash2 />Delete</button></div>
         </article>)}</div>}
-        {page < pages && <button className="btn btn-secondary gallery-load-more" onClick={() => load({ append: true, targetPage: page + 1 })} disabled={loadingMore}>{loadingMore ? "Loading…" : "Load More Photos"}</button>}
+        <p className="gallery-loaded-count">Showing {photos.length} of {total} photos</p>
+        {photos.length < total && <button className="btn btn-secondary gallery-load-more" onClick={() => load({ append: true, targetPage: page + 1, offset: photos.length })} disabled={loadingMore}>{loadingMore ? "Loading…" : "Load More Photos"}</button>}
       </>}
     </section>
     {confirmDelete && <PhotoDeleteDialog photo={confirmDelete} onClose={() => !confirmDelete.deleting && setConfirmDelete(null)} onConfirm={removePhoto} />}
   </div>;
+}
+
+function PhotoAltText({ photo, eventId, onSaved }) {
+  const [value, setValue] = useState(photo.altText || "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  useEffect(() => { setValue(photo.altText || ""); }, [photo.altText]);
+  async function save(event) {
+    event.preventDefault();
+    setSaving(true); setError("");
+    try { const result = await setAdminGalleryAltText(eventId, photo.id, value.trim()); onSaved(result.altText); }
+    catch (requestError) { setError(requestError.message); }
+    finally { setSaving(false); }
+  }
+  return <form className="gallery-photo-alt" onSubmit={save}><label htmlFor={`alt-${photo.id}`}>Image description</label><div><input id={`alt-${photo.id}`} value={value} maxLength={240} onChange={(event) => setValue(event.target.value)} placeholder="Describe the photograph" /><button type="submit" disabled={saving || value.trim() === (photo.altText || "")}>{saving ? "Saving…" : "Save"}</button></div>{error && <small role="alert">{error}</small>}</form>;
 }
 
 async function uploadOne(item, permission, eventId, patchQueue) {

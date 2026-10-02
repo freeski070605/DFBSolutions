@@ -39,9 +39,10 @@ export function runAdminGalleryAction(id, action) {
   return request(`/api/admin/galleries?id=${encodeURIComponent(id)}&action=${encodeURIComponent(action)}`, { method: "POST", body: JSON.stringify({}) });
 }
 
-export function listAdminGalleryPhotos(eventId, { page = 1, limit = 40, status = "" } = {}) {
+export function listAdminGalleryPhotos(eventId, { page = 1, limit = 40, status = "", offset } = {}) {
   const params = new URLSearchParams({ eventId, page: String(page), limit: String(limit) });
   if (status) params.set("status", status);
+  if (offset != null) params.set("offset", String(offset));
   return request(`/api/admin/gallery-photos?${params}`);
 }
 
@@ -101,6 +102,26 @@ export function deleteAdminGalleryVideo(eventId, videoId) {
 
 export function listGalleryPhotos({ page = 1, limit = 40 } = {}) {
   return request(`/api/gallery/photos?page=${page}&limit=${limit}`);
+}
+
+export function listAdminGallerySlideshow(eventId) {
+  return request(`/api/admin/gallery-photos?eventId=${encodeURIComponent(eventId)}&view=slideshow`);
+}
+
+export function listGallerySlideshow() {
+  return request("/api/gallery/photos?view=slideshow");
+}
+
+export function setAdminGallerySlideshowFeature(eventId, photoId, featured) {
+  return request("/api/admin/gallery-photos?action=set-slideshow-feature", { method: "POST", body: JSON.stringify({ eventId, photoId, featured }) });
+}
+
+export function setAdminGalleryAltText(eventId, photoId, altText) {
+  return request("/api/admin/gallery-photos?action=set-alt-text", { method: "POST", body: JSON.stringify({ eventId, photoId, altText }) });
+}
+
+export function reorderAdminGallerySlideshow(eventId, photoIds) {
+  return request("/api/admin/gallery-photos?action=reorder-slideshow", { method: "POST", body: JSON.stringify({ eventId, photoIds }) });
 }
 
 export function requestGalleryPhotoDownload(photoId) {
